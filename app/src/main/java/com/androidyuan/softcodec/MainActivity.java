@@ -17,27 +17,22 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
         PreviewCallback {
     static String TAG = "CameraPreview";
 
+    static {
+        System.loadLibrary("share_x264");
+    }
+
     Camera camera;
     SurfaceHolder previewHolder;
-
     byte[] previewBuffer;
-
     int width = 640;// 编码宽度
     int height = 480;// 编码高度
     int VideoBitrate = 512 * 2;
     int fps = 15;
-
-    private String flv_url = "rtmp://up.quanmin.tv/live/160?key=5376b705a4fd31c449f84c8e9324a9a6";
-
+    private String flv_url = "rtmp://192.168.199.178:1935/live/test";
     private long encoder = 0;
     private byte[] h264Buff = null;
-
     private int currenttime;
     private int EncodeTime;
-
-    static {
-        System.loadLibrary("share_x264");
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,6 +133,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
         }
     }
 
+
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
 
@@ -158,6 +154,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
 
     @Override
     protected void onPause() {
+        findViewById(R.id.stop).performClick();
         super.onPause();
     }
 
