@@ -1,2 +1,4 @@
 # SoftCodec
-软编为H264，用RTMP上传。
+
+1.软编为H264
+2.用RTMP上传。
