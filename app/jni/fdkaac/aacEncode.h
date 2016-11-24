@@ -25,7 +25,7 @@ typedef struct AudioOutput {
 }AACOutput;
 
 typedef struct EncodeAAC Encode;
-jint Java_com_androidyuan_softcodec_AudioRecorde_initAAC(JNIEnv* env,jobject thiz, jint bitrate,jint samplerate,jint channels);
-jint Java_com_androidyuan_softcodec_AudioRecorde_getbuffersize(JNIEnv* env, jobject thiz);
-jboolean Java_com_androidyuan_softcodec_AudioRecorde_encodeFrame(JNIEnv *pEnv,jobject obj,jbyteArray pcmData);
+jint Java_com_androidyuan_softcodec_AudioRecorder_initAAC(JNIEnv* env,jobject thiz, jint bitrate,jint samplerate,jint channels);
+jint Java_com_androidyuan_softcodec_AudioRecorder_getbuffersize(JNIEnv* env, jobject thiz);
+jboolean Java_com_androidyuan_softcodec_AudioRecorder_encodeFrame(JNIEnv *pEnv,jobject obj,jbyteArray pcmData);
 bool aacEncoderProcess(AACENC_BufDesc* in_buf,AACENC_BufDesc* out_buf,AACENC_InArgs* in_args,AACENC_OutArgs* out_args);

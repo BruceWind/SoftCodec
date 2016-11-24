@@ -17,10 +17,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
         PreviewCallback {
     static String TAG = "CameraPreview";
 
-    static {
-        System.loadLibrary("share_x264");
-    }
-
     Camera camera;
     SurfaceHolder previewHolder;
     byte[] previewBuffer;
@@ -28,6 +24,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
     int height = 480;// 编码高度
     int VideoBitrate = 512 * 2;
     int fps = 15;
+    StreamHelper mStreamHelper = new StreamHelper();
     private String flv_url = "rtmp://192.168.199.178:1935/live/test";
     private long encoder = 0;
     private byte[] h264Buff = null;
@@ -36,6 +33,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_main);
 
@@ -50,7 +48,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
                     @Override
                     public void onClick(View v) {
                         startCamera();
-                        AudioRecorde.startRecorde(currenttime);
+                        AudioRecorder.startRecorde(currenttime);
                     }
                 });
         this.findViewById(R.id.stop).setOnClickListener(
@@ -58,7 +56,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
                     @Override
                     public void onClick(View v) {
                         stopCamera();
-                        AudioRecorde.stopRecorde();
+                        AudioRecorder.stopRecorde();
                     }
                 });
 
@@ -66,7 +64,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (Rtmpopen(flv_url) > 0) {
+                        if (mStreamHelper.rtmpOpen(flv_url) > 0) {
                             Log.d(TAG, "成功连結");
                             currenttime = (int) (System.currentTimeMillis());
                         }
@@ -77,7 +75,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
     @SuppressLint("InlinedApi")
     private void startCamera() {
 
-        encoder = CompressBegin(width, height, VideoBitrate, fps);
+        encoder = mStreamHelper.compressBegin(width, height, VideoBitrate, fps);
 
         h264Buff = new byte[width * height * 8];
 
@@ -93,6 +91,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
         try {
             camera = Camera.open();
             camera.setDisplayOrientation(90);
+
             camera.setPreviewDisplay(this.previewHolder);
             Camera.Parameters params = camera.getParameters();
             params.setPreviewSize(width, height);
@@ -115,7 +114,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
         this.camera.addCallbackBuffer(this.previewBuffer);
 
 
-        int result = CompressBuffer(encoder,
+        int result = mStreamHelper.compressBuffer(encoder,
                 data,
                 data.length,
                 h264Buff);
@@ -124,8 +123,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
 
     private void stopCamera() {
         if (camera != null) {
-            Rtmpstop();
-            CompressEnd(encoder);
+            mStreamHelper.rtmpStop();
+            mStreamHelper.compressEnd(encoder);
             camera.setPreviewCallback(null);
             camera.stopPreview();
             camera.release();
@@ -157,17 +156,5 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
         findViewById(R.id.stop).performClick();
         super.onPause();
     }
-
-    /*rtmp*/
-    public native int Rtmpopen(String url);
-
-    private native int Rtmpstop();
-
-    /*x264 funtion*/
-    private native int CompressBuffer(long encoder, byte[] NV12, int NV12size, byte[] H264);
-
-    private native long CompressBegin(int width, int height, int bitrate, int fps);
-
-    private native int CompressEnd(long encoder);
 
 }

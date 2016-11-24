@@ -6,31 +6,31 @@
 #include <x264/include/x264.h>
 #include "flvmuxer/xiecc_rtmp.h"
 
-/*CompressBegin
+/*compressBegin
  *初始化x264
  *width 宽度
  *height 高度
  *bitrate 码率
  *fps 幀率
  */
-JNIEXPORT jlong Java_com_androidyuan_softcodec_MainActivity_CompressBegin(JNIEnv* env,
+JNIEXPORT jlong Java_com_androidyuan_softcodec_StreamHelper_compressBegin(JNIEnv* env,
 		jobject thiz, jint width, jint height, jint bitrate, jint fps);
 
-/*CompressEnd
+/*compressEnd
  *結束x264编码
  *handle
  */
-JNIEXPORT jint Java_com_androidyuan_softcodec_MainActivity_CompressEnd(JNIEnv* env,
+JNIEXPORT jint Java_com_androidyuan_softcodec_StreamHelper_compressEnd(JNIEnv* env,
 		jobject thiz, jlong handle);
 
-/*CompressBegin
+/*compressBegin
  *编码x264
  *handle
  *in nv12
  *insize nv12 长度
  *out h264
  */
-JNIEXPORT jint Java_com_androidyuan_softcodec_MainActivity_CompressBuffer(JNIEnv* env,
+JNIEXPORT jint Java_com_androidyuan_softcodec_StreamHelper_compressBuffer(JNIEnv* env,
 		jobject thiz,
 		jlong handle,
 		jbyteArray in,

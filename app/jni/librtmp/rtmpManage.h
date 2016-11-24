@@ -5,11 +5,11 @@
 /*
  *rtmp的连接
  */
-JNIEXPORT jint Java_com_androidyuan_softcodec_MainActivity_open(JNIEnv *env,jobject instance, jstring url_);
+JNIEXPORT jint Java_com_androidyuan_softcodec_StreamHelper_open(JNIEnv *env,jobject instance, jstring url_);
 
 
 /*
  *断开rtmp的
  */
 
-JNIEXPORT jint Java_com_androidyuan_softcodec_MainActivity_stop(JNIEnv *env,jobject instance);
+JNIEXPORT jint Java_com_androidyuan_softcodec_StreamHelper_stop(JNIEnv *env,jobject instance);

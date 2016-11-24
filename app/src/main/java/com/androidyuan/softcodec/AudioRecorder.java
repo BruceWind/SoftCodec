@@ -6,9 +6,9 @@ import android.media.MediaRecorder;
 import android.util.Log;
 
 
-public class AudioRecorde {
+public class AudioRecorder {
 
-    static final String TAG = "AudioRecorde";
+    static final String TAG = "AudioRecorder";
 
     private static AudioRecord audioRecord = null;
     private static boolean isRecording = false;// 录音标志位
@@ -16,8 +16,8 @@ public class AudioRecorde {
     private static int channel = AudioFormat.CHANNEL_IN_STEREO;// 设置声道,立体声，双声道
     private static int encodingBitRate = AudioFormat.ENCODING_PCM_16BIT;// 设置编码。脉冲编码调制（PCM）每个样品16位
     private static int recBufSize = 0;
-    private int playBufSize = 0;
     private static Thread recThread = null;// 录音线程
+    private int playBufSize = 0;
 
     static void startRecorde(final int currenttime) {
         int initSuccess = initAAC(64000, frequency, 2);
