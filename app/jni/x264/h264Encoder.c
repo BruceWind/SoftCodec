@@ -155,8 +155,10 @@ JNIEXPORT jint Java_com_androidyuan_softcodec_StreamHelper_compressBuffer(JNIEnv
 	}
 
 
+    //此处的CPU耗时过高 在nexus5上测试发现 接近 200ms 了
 	i_frame_size=x264_encoder_encode(en->handle, &(en->nal), &nNal, en->picture,
 			&pic_out) ;
+
 	if( i_frame_size < 0) {
 		return -1;
 	}
