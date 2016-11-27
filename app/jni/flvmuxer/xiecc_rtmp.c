@@ -284,7 +284,7 @@ void send_rtmp_audio(unsigned char *buf, uint32_t len,int time) {
 }
 
 int stopRtmpConnect() {
-	if (rtmp != NULL) {
+	if (isConnected()) {
 
 		//時間戳要歸0 否則打次傳輸 會有問題
 //            videotimeoffset=0;
