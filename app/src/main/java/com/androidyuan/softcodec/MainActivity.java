@@ -29,6 +29,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
     private long encoder = 0;
     private byte[] h264Buff = null;
     private int currenttime;
+
     private int EncodeTime;
 
     @Override
@@ -96,6 +97,10 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
             Camera.Parameters params = camera.getParameters();
             params.setPreviewSize(width, height);
             params.setPreviewFormat(ImageFormat.NV21);
+            //自动对焦
+            if (params.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
+                params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
+            }
             camera.setParameters(params);
             camera.addCallbackBuffer(previewBuffer);
             camera.setPreviewCallbackWithBuffer(this);
