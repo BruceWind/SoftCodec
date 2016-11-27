@@ -3,7 +3,7 @@ package com.androidyuan.softcodec;
 /**
  * Created by wei on 16-11-24.
  */
-public class StreamHelper {
+class StreamHelper {
 
 
     static {

@@ -1,4 +1,4 @@
-package com.androidyuan.softcodec;
+package com.androidyuan.ui;
 
 import java.io.IOException;
 
@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import com.androidyuan.softcodec.R;
+import com.androidyuan.softcodec.RtmpHelper;
 
 public class MainActivity extends Activity implements SurfaceHolder.Callback,
         PreviewCallback {
@@ -24,13 +26,16 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
     int height = 480;// 编码高度
     int VideoBitrate = 512 * 2;
     int fps = 15;
-    StreamHelper mStreamHelper = new StreamHelper();
+
+
     private String flv_url = "rtmp://192.168.199.178:1935/live/test";
     private long encoder = 0;
     private byte[] h264Buff = null;
     private int currenttime;
 
     private int EncodeTime;
+
+    RtmpHelper mRtmpHelper = new RtmpHelper();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +54,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
                     @Override
                     public void onClick(View v) {
                         startCamera();
-                        AudioRecorder.startRecorde(currenttime);
+                        mRtmpHelper.startRecordeAudio(currenttime);
                     }
                 });
         this.findViewById(R.id.stop).setOnClickListener(
@@ -57,7 +62,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
                     @Override
                     public void onClick(View v) {
                         stopCamera();
-                        AudioRecorder.stopRecorde();
+                        mRtmpHelper.stopRecordeAudio();
                     }
                 });
 
@@ -65,7 +70,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (mStreamHelper.rtmpOpen(flv_url) > 0) {
+                        if (mRtmpHelper.rtmpOpen(flv_url) > 0) {
                             Log.d(TAG, "成功连結");
                             currenttime = (int) (System.currentTimeMillis());
                         }
@@ -76,7 +81,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
     @SuppressLint("InlinedApi")
     private void startCamera() {
 
-        encoder = mStreamHelper.compressBegin(width, height, VideoBitrate, fps);
+        encoder = mRtmpHelper.compressBegin(width, height, VideoBitrate, fps);
 
         h264Buff = new byte[width * height * 8];
 
@@ -119,7 +124,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
         this.camera.addCallbackBuffer(this.previewBuffer);
 
 
-        int result = mStreamHelper.compressBuffer(encoder,
+        int result = mRtmpHelper.compressBuffer(encoder,
                 data,
                 data.length,
                 h264Buff);
@@ -128,8 +133,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
 
     private void stopCamera() {
         if (camera != null) {
-            mStreamHelper.rtmpStop();
-            mStreamHelper.compressEnd(encoder);
+            mRtmpHelper.rtmpStop();
+            mRtmpHelper.compressEnd(encoder);
             camera.setPreviewCallback(null);
             camera.stopPreview();
             camera.release();
