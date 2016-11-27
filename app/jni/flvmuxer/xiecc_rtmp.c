@@ -181,6 +181,14 @@ void send_rtmp_video(uint8_t *data, int data_len, int timestamp) {
 	}
 }
 
+int isConnected()
+{
+    if(rtmp!=NULL && RTMP_IsConnected(rtmp))
+         return 1;
+    else
+        return 0;
+}
+
 void send_rtmp_audio_spec(unsigned char *spec_buf, uint32_t spec_len) {
 
 

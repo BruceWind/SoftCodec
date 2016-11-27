@@ -117,6 +117,12 @@ JNIEXPORT jint Java_com_androidyuan_softcodec_StreamHelper_compressEnd(JNIEnv* e
  * compress the buffer data
  */
 JNIEXPORT jint Java_com_androidyuan_softcodec_StreamHelper_compressBuffer(JNIEnv* env,jobject thiz, jlong handle, jbyteArray in, jint insize,jbyteArray out) {
+
+
+    if(!isConnected())
+        return 0;
+
+
 	Encoder *en = (Encoder*) handle;
 	x264_picture_t pic_out;
 	int i_data = 0;
