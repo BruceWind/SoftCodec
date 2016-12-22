@@ -11,12 +11,9 @@ import android.util.Log;
 
 public class RtmpHelper {
 
+    final ExecutorService rtmpExecutor = Executors.newSingleThreadExecutor();
     Timer timer;
     long fps=0;
-
-
-    final ExecutorService rtmpExecutor = Executors.newSingleThreadExecutor();
-
     StreamHelper mStreamHelper = new StreamHelper();
 
     /*rtmp*/
@@ -53,8 +50,8 @@ public class RtmpHelper {
         rtmpExecutor.execute(new Runnable() {
             @Override
             public void run() {
-                fps++;
                 mStreamHelper.compressBuffer(encoder,NV12,NV12size,H264);
+                fps++;
             }
         });
         return 0;

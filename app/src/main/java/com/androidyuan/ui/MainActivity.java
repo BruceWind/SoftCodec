@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.WindowManager;
+
 import com.androidyuan.softcodec.R;
 import com.androidyuan.softcodec.RtmpHelper;
 
@@ -26,21 +28,19 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
     int height = 480;// 编码高度
     int VideoBitrate = 512 * 2;
     int fps = 15;
-
-
-    private String flv_url = "rtmp://192.168.199.178:1935/live/test";
+    RtmpHelper mRtmpHelper = new RtmpHelper();
+    private String flv_url = "rtmp://172.16.71.203:1935/live/test";
     private long encoder = 0;
     private byte[] h264Buff = null;
     private int currenttime;
-
     private int EncodeTime;
-
-    RtmpHelper mRtmpHelper = new RtmpHelper();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         this.setContentView(R.layout.activity_main);
 
         SurfaceView svCameraPreview = (SurfaceView) this
