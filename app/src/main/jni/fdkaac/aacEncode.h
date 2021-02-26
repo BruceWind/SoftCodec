@@ -1,10 +1,10 @@
-#include "fdkaac/include/fdk-aac/aacenc_lib.h"
+#include "include/aacenc_lib.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <jni.h>
-#include "xiecc_rtmp.h"
+#include "../flvmuxer/xiecc_rtmp.h"
 #include "stdbool.h"
 
 

@@ -1,8 +1,8 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "rtmp.h"
-#include "log.h"
+#include "librtmp/include/rtmp.h"
+#include <android/log.h>
 #include "x264/include/x264.h"
 #include "xiecc_rtmp.h"
 #include <android/log.h>
