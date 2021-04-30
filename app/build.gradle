@@ -1,13 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "24.0.1"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.3"
+
+    ndkVersion "16.1.4479499"
 
     defaultConfig {
         applicationId "com.androidyuan.softcodec"
-        minSdkVersion 17
-        targetSdkVersion 14
+        minSdkVersion 21
+        targetSdkVersion 21
         versionCode 1
         versionName "1.0"
         ndk {
@@ -36,4 +38,5 @@ android {
 dependencies {
     testImplementation 'junit:junit:4.12'
     implementation 'com.android.support:appcompat-v7:25.0.1'
+//    implementation "com.android.support.constraint:constraint-layout:2.0.4"
 }

@@ -37,7 +37,7 @@ JNIEXPORT jlong Java_com_androidyuan_softcodec_StreamHelper_compressBegin(JNIEnv
 		x264_param_default_preset(en->param, "veryfast", "zerolatency"); //set encoder params
 		en->param->i_width = width;
 		en->param->i_height = height;
-		en->param->i_threads = 0;/* encode multiple frames in parallel */
+		en->param->i_threads = 1;/* encode multiple frames in parallel */
 		en->param->b_sliced_threads = 1;
 		en->param->i_bframe_adaptive = X264_B_ADAPT_FAST;
 		en->param->i_bframe_pyramid = X264_B_PYRAMID_NONE; /*允许部分B为参考帧,可选值为0，1，2 */

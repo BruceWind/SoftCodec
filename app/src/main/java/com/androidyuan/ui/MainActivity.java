@@ -26,14 +26,14 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
     byte[] previewBuffer;
     int width = 640;// 编码宽度
     int height = 480;// 编码高度
-    int VideoBitrate = 512 * 2;
-    int fps = 15;
+    int VideoBitrate = 512 *4;
+    int fps = 60;
     RtmpHelper mRtmpHelper = new RtmpHelper();
-    private String flv_url = "rtmp://172.16.71.203:1935/live/test";
+    private String rtmpPushUrl = "rtmp://172.26.201.159/live/live";
     private long encoder = 0;
     private byte[] h264Buff = null;
     private int currenttime;
-    private int EncodeTime;
+    private int encodeTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,33 +49,42 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
 
         this.previewHolder.addCallback(this);
 
-        this.findViewById(R.id.start).setOnClickListener(
+
+        findViewById(R.id.connect).setOnClickListener(
+            new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mRtmpHelper.rtmpOpen(rtmpPushUrl) > 0) {
+                        Log.d(TAG, "成功连結");
+                        currenttime = (int) (System.currentTimeMillis());
+                        findViewById(R.id.start).setEnabled(true);
+                        v.setEnabled(false);
+                    }
+                }
+            });
+
+        findViewById(R.id.start).setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        v.setEnabled(false);
                         startCamera();
                         mRtmpHelper.startRecordeAudio(currenttime);
+                        findViewById(R.id.stop).setEnabled(true);
                     }
                 });
-        this.findViewById(R.id.stop).setOnClickListener(
+
+        findViewById(R.id.stop).setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         stopCamera();
                         mRtmpHelper.stopRecordeAudio();
+                        v.setEnabled(false);
+                        findViewById(R.id.connect).setEnabled(true);
                     }
                 });
 
-        this.findViewById(R.id.connect).setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (mRtmpHelper.rtmpOpen(flv_url) > 0) {
-                            Log.d(TAG, "成功连結");
-                            currenttime = (int) (System.currentTimeMillis());
-                        }
-                    }
-                });
     }
 
     @SuppressLint("InlinedApi")
@@ -111,9 +120,9 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
             camera.setPreviewCallbackWithBuffer(this);
             camera.startPreview();
         } catch (IOException e) {
-            // TODO:
+            e.printStackTrace();
         } catch (RuntimeException e) {
-            // TODO:
+            e.printStackTrace();
         }
     }
 
