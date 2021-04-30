@@ -155,7 +155,7 @@ JNIEXPORT jint Java_io_github_brucewind_softcodec_StreamHelper_compressBuffer(JN
 	}
 
 
-    //此处的CPU耗时过高 在nexus5上测试发现 接近 200ms 了
+    //this line is slow in  nexus5.
 	i_frame_size=x264_encoder_encode(en->handle, &(en->nal), &nNal, en->picture,
 			&pic_out) ;
 

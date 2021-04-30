@@ -6,25 +6,28 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import android.util.Log;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by wei on 16-11-27.
+ *
+ * It is used to manager picture to be encode, and transfer encoded data to server in {@link ExecutorService}.
  */
 public class RtmpHelper {
 
-  private ExecutorService rtmpExecutor = Executors.newSingleThreadExecutor();
-  private Timer timer;
-  private long fps = 0;
-  private StreamHelper mStreamHelper = new StreamHelper();
+  private ExecutorService mRtmpExecutor = Executors.newSingleThreadExecutor();
+  private Timer mTimer;
+  private AtomicInteger mFpsAtomic = new AtomicInteger(0);
+  private final StreamHelper mStreamHelper = new StreamHelper();
 
   /*rtmp*/
   public int rtmpOpen(final String url) {
-    timer = new Timer();
-    timer.schedule(new TimerTask() {
+    mTimer = new Timer();
+    mTimer.schedule(new TimerTask() {
       @Override
       public void run() {
-        Log.d("RtmpHelper", "fps = " + fps);
-        fps = 0;
+        Log.d("RtmpHelper", "fps = " + mFpsAtomic.get());
+        mFpsAtomic.set(0);
       }
     }, 1000, 1000);
 
@@ -32,23 +35,23 @@ public class RtmpHelper {
   }
 
   public int rtmpStop() {
-    if (timer != null) {
-      timer.cancel();
+    if (mTimer != null) {
+      mTimer.cancel();
     }
 
-    rtmpExecutor.execute(new Runnable() {
+    mRtmpExecutor.execute(new Runnable() {
       @Override
       public void run() {
         mStreamHelper.rtmpStop();
-        rtmpExecutor.shutdown();
+        mRtmpExecutor.shutdown();
         try {
-          final ExecutorService temp = rtmpExecutor;
+          final ExecutorService temp = mRtmpExecutor;
           temp.awaitTermination(1, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
           e.printStackTrace();
         }
 
-        rtmpExecutor = Executors.newSingleThreadExecutor();
+        mRtmpExecutor = Executors.newSingleThreadExecutor();
 
       }
     });
@@ -58,11 +61,11 @@ public class RtmpHelper {
   /*x264 funtion*/
   public int compressBuffer(final long encoder, final byte[] NV12, final int NV12size,
       final byte[] H264) {
-    rtmpExecutor.execute(new Runnable() {
+    mRtmpExecutor.execute(new Runnable() {
       @Override
       public void run() {
         mStreamHelper.compressBuffer(encoder, NV12, NV12size, H264);
-        fps++;
+        mFpsAtomic.incrementAndGet();
       }
     });
     return 0;

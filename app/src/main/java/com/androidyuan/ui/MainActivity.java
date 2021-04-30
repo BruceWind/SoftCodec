@@ -1,5 +1,8 @@
 package com.androidyuan.ui;
 
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
 import android.widget.Toast;
 import io.github.brucewind.softcodec.RtmpHelper;
 import java.io.IOException;
@@ -20,21 +23,24 @@ import com.androidyuan.softcodec.R;
 
 public class MainActivity extends Activity implements SurfaceHolder.Callback,
         PreviewCallback {
-    static String TAG = "CameraPreview";
+    private static final String TAG = "MainActivity";
 
-    Camera camera;
-    SurfaceHolder previewHolder;
-    byte[] previewBuffer;
-    int width = 640;// 编码宽度
-    int height = 480;// 编码高度
-    int VideoBitrate = 512 *4;
-    int fps = 60;
-    RtmpHelper mRtmpHelper = new RtmpHelper();
-    private String rtmpPushUrl = "rtmp://192.168.50.161/live/live";
-    private long encoder = 0;
-    private byte[] h264Buff = null;
-    private int currenttime;
+    Camera mCamera;
+    SurfaceHolder mPreviewHolder;
+    byte[] mPreviewBuffer;
+    //TODO get the compatible size from camera.
+    int width = 640;
+    int height = 480;
+    private final int VIDEOBITRATE = 512 *4;
+    private final int FPS = 60;
+    private RtmpHelper mRtmpHelper = new RtmpHelper();
+    private String mRtmpPushUrl = "rtmp://192.168.50.161/live/live";
+    private long mEncoderPointer = 0;
+    private byte[] mH264Buff = null;
+    private int mCurrentTime;
     private int encodeTime;
+
+    private EditText editText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,28 +48,50 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
         super.onCreate(savedInstanceState);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        this.setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main);
 
         SurfaceView svCameraPreview = (SurfaceView) this
                 .findViewById(R.id.surfaceView);
-        this.previewHolder = svCameraPreview.getHolder();
+        mPreviewHolder = svCameraPreview.getHolder();
 
-        this.previewHolder.addCallback(this);
+        mPreviewHolder.addCallback(this);
 
+
+        editText = (EditText) findViewById(R.id.edit_url);
+        editText.setText(mRtmpPushUrl);
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                mRtmpPushUrl = editable.toString();
+            }
+        });
 
         findViewById(R.id.connect).setOnClickListener(
             new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     v.setEnabled(false);
-                    if (mRtmpHelper.rtmpOpen(rtmpPushUrl) > 0) {
-                        Log.d(TAG, getString(R.string.tips_connect_successfully,rtmpPushUrl));
-                        currenttime = (int) (System.currentTimeMillis());
+                    editText.setEnabled(false);
+                    if (mRtmpHelper.rtmpOpen(mRtmpPushUrl) > 0) {
+                        Log.d(TAG, getString(R.string.tips_connect_successfully, mRtmpPushUrl));
+                        mCurrentTime = (int) (System.currentTimeMillis());
                         findViewById(R.id.start).setEnabled(true);
                     }
                     else{
                         v.setEnabled(true);
-                        Toast.makeText(MainActivity.this,getString(R.string.tips_cannt_connect,rtmpPushUrl),Toast.LENGTH_SHORT).show();
+                        editText.setEnabled(true);
+                        Toast.makeText(MainActivity.this,getString(R.string.tips_cannt_connect,
+                            mRtmpPushUrl),Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -74,7 +102,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
                     public void onClick(View v) {
                         v.setEnabled(false);
                         startCamera();
-                        mRtmpHelper.startRecordeAudio(currenttime);
+                        mRtmpHelper.startRecordeAudio(mCurrentTime);
                         findViewById(R.id.stop).setEnabled(true);
                     }
                 });
@@ -95,35 +123,35 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
     @SuppressLint("InlinedApi")
     private void startCamera() {
 
-        encoder = mRtmpHelper.compressBegin(width, height, VideoBitrate, fps);
+        mEncoderPointer = mRtmpHelper.compressBegin(width, height, VIDEOBITRATE, FPS);
 
-        h264Buff = new byte[width * height * 8];
+        mH264Buff = new byte[width * height * 8];
 
-        this.previewHolder.setFixedSize(width, height);
+        mPreviewHolder.setFixedSize(width, height);
 
         int stride = (int) Math.ceil(width / 16.0f) * 16;
         int cStride = (int) Math.ceil(width / 32.0f) * 16;
         final int frameSize = stride * height;
         final int qFrameSize = cStride * height / 2;
 
-        this.previewBuffer = new byte[frameSize + qFrameSize * 2];
+        mPreviewBuffer = new byte[frameSize + qFrameSize * 2];
 
         try {
-            camera = Camera.open();
-            camera.setDisplayOrientation(90);
+            mCamera = Camera.open();
+            mCamera.setDisplayOrientation(90);
 
-            camera.setPreviewDisplay(this.previewHolder);
-            Camera.Parameters params = camera.getParameters();
+            mCamera.setPreviewDisplay(mPreviewHolder);
+            Camera.Parameters params = mCamera.getParameters();
             params.setPreviewSize(width, height);
             params.setPreviewFormat(ImageFormat.NV21);
             //自动对焦
             if (params.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
                 params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
             }
-            camera.setParameters(params);
-            camera.addCallbackBuffer(previewBuffer);
-            camera.setPreviewCallbackWithBuffer(this);
-            camera.startPreview();
+            mCamera.setParameters(params);
+            mCamera.addCallbackBuffer(mPreviewBuffer);
+            mCamera.setPreviewCallbackWithBuffer(this);
+            mCamera.startPreview();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (RuntimeException e) {
@@ -135,24 +163,24 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
     public void onPreviewFrame(byte[] data, Camera camera) {
         // TODO Auto-generated method stub
 
-        this.camera.addCallbackBuffer(this.previewBuffer);
+        mCamera.addCallbackBuffer(mPreviewBuffer);
 
 
-        int result = mRtmpHelper.compressBuffer(encoder,
+        int result = mRtmpHelper.compressBuffer(mEncoderPointer,
                 data,
                 data.length,
-                h264Buff);
+            mH264Buff);
 
     }
 
     private void stopCamera() {
-        if (camera != null) {
+        if (mCamera != null) {
             mRtmpHelper.rtmpStop();
-            mRtmpHelper.compressEnd(encoder);
-            camera.setPreviewCallback(null);
-            camera.stopPreview();
-            camera.release();
-            camera = null;
+            mRtmpHelper.compressEnd(mEncoderPointer);
+            mCamera.setPreviewCallback(null);
+            mCamera.stopPreview();
+            mCamera.release();
+            mCamera = null;
         }
     }
 

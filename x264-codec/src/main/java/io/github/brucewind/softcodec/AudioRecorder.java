@@ -5,16 +5,18 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
 
-
+/**
+ *  Obviously it is used to record audio.
+ */
 public class AudioRecorder {
 
     static final String TAG = "AudioRecorder";
 
-    private static AudioRecord audioRecord = null;
+    private static AudioRecord mAudioRecord = null;
     private static boolean isRecording = false;// 录音标志位
-    private static int frequency = 44100;
-    private static int channel = AudioFormat.CHANNEL_IN_STEREO;// 设置声道,立体声，双声道
-    private static int encodingBitRate = AudioFormat.ENCODING_PCM_16BIT;// 设置编码。脉冲编码调制（PCM）每个样品16位
+    private static final int frequency = 44100;
+    private static final  int channel = AudioFormat.CHANNEL_IN_STEREO;// 设置声道,立体声，双声道
+    private static final int encodingBitRate = AudioFormat.ENCODING_PCM_16BIT;// 设置编码。脉冲编码调制（PCM）每个样品16位
     private static int recBufSize = 0;
     private static Thread recThread = null;// 录音线程
     private int playBufSize = 0;
@@ -25,31 +27,31 @@ public class AudioRecorder {
         Log.d(TAG, "initSuccess" + ":" + initSuccess);
         if (initSuccess > 0) {
             startRec();
-            Log.d(TAG, "初始化成功");
+            Log.d(TAG, "inited successfully.");
         } else {
-            Log.e(TAG, "初始化失败");
+            Log.e(TAG, "inited failed.");
         }
 
     }
 
-    // 开始录音
+    // start record time
     private static void startRec() {
-        // 获取最小buf大小
+        // obtain min buf size
 
         recBufSize = getbuffersize();
-        Log.v(TAG, "fdkaac需要输入的buffer大小：" + recBufSize);
+        Log.v(TAG, "fdkaac input buffer size:" + recBufSize);
         recBufSize = AudioRecord.getMinBufferSize(frequency, channel, encodingBitRate);
 
-        Log.v(TAG, "系统支持的最小buffer大小：" + recBufSize);
+        Log.v(TAG, "device supports minimum buffer size:" + recBufSize);
 
-        // 初始化录音机
-        audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,
+        // init record.
+        mAudioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,
                 frequency,
                 channel,
                 encodingBitRate,
                 recBufSize);
 
-        audioRecord.startRecording();
+        mAudioRecord.startRecording();
 
         isRecording = true;
 
@@ -58,15 +60,15 @@ public class AudioRecorder {
                 byte data[] = new byte[recBufSize];
                 int read = 0;
                 while (isRecording) {
-                    read = audioRecord.read(data, 0, 4096);
+                    read = mAudioRecord.read(data, 0, 4096);
 
                     if (AudioRecord.ERROR_INVALID_OPERATION != read) {
                         boolean success = encodeFrame(data);
 
                         if (success) {
-//							Log.d(TAG, "写入文件。。");
+//							Log.d(TAG, "whiting file..");
                         } else {
-                            Log.e(TAG, "aac写入文件失败");
+                            Log.e(TAG, "aac write into file failure.");
                         }
                     }
                 }
@@ -78,11 +80,11 @@ public class AudioRecorder {
 
 
     static void stopRecorde() {
-        if (null != audioRecord) {
+        if (null != mAudioRecord) {
             isRecording = false;
-            audioRecord.stop();
-            audioRecord.release();
-            audioRecord = null;
+            mAudioRecord.stop();
+            mAudioRecord.release();
+            mAudioRecord = null;
             recThread = null;
         }
     }
