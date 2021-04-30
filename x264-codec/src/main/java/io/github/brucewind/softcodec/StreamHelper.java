@@ -1,4 +1,4 @@
-package com.androidyuan.softcodec;
+package io.github.brucewind.softcodec;
 
 /**
  * Created by wei on 16-11-24.

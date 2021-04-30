@@ -1,4 +1,4 @@
-package com.androidyuan.softcodec;
+package io.github.brucewind.softcodec;
 
 import android.media.AudioFormat;
 import android.media.AudioRecord;

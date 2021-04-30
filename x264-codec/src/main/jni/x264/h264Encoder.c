@@ -26,7 +26,7 @@ int pps_len;
 #define ALOGE(...) __android_log_print(ANDROID_LOG_ERROR  , LOGTAG, __VA_ARGS__)
 
 
-JNIEXPORT jlong Java_com_androidyuan_softcodec_StreamHelper_compressBegin(JNIEnv* env,
+JNIEXPORT jlong Java_io_github_brucewind_softcodec_StreamHelper_compressBegin(JNIEnv* env,
 		jobject thiz, jint width, jint height, jint bitrate, jint fps) {
 
 
@@ -81,7 +81,7 @@ JNIEXPORT jlong Java_com_androidyuan_softcodec_StreamHelper_compressBegin(JNIEnv
 /**
  * When compress end, clear some resource
  */
-JNIEXPORT jint Java_com_androidyuan_softcodec_StreamHelper_compressEnd(JNIEnv* env,
+JNIEXPORT jint Java_io_github_brucewind_softcodec_StreamHelper_compressEnd(JNIEnv* env,
 		jobject thiz, jlong handle) {
 	Encoder *en = (Encoder*) handle;
 	ALOGE("begin free!");
@@ -116,7 +116,7 @@ JNIEXPORT jint Java_com_androidyuan_softcodec_StreamHelper_compressEnd(JNIEnv* e
 /**
  * compress the buffer data
  */
-JNIEXPORT jint Java_com_androidyuan_softcodec_StreamHelper_compressBuffer(JNIEnv* env,jobject thiz, jlong handle, jbyteArray in, jint insize,jbyteArray out) {
+JNIEXPORT jint Java_io_github_brucewind_softcodec_StreamHelper_compressBuffer(JNIEnv* env,jobject thiz, jlong handle, jbyteArray in, jint insize,jbyteArray out) {
 
 
     if(!isConnected())

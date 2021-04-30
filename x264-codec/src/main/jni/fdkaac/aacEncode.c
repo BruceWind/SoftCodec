@@ -9,7 +9,7 @@ AACOutput* fdkencode;
 #define LOGE(...) __android_log_print(6, LOG_TAG, __VA_ARGS__);
 
 
-jint Java_com_androidyuan_softcodec_AudioRecorder_initAAC(JNIEnv* env, jobject thiz,
+jint Java_io_github_brucewind_softcodec_AudioRecorder_initAAC(JNIEnv* env, jobject thiz,
 		jint bitrate, jint sample_rate, jint channels) {
 
 	fdkencode=(AACOutput *) malloc(sizeof(AACOutput));
@@ -88,7 +88,7 @@ jint Java_com_androidyuan_softcodec_AudioRecorder_initAAC(JNIEnv* env, jobject t
 	return 1;
 
 }
-jint Java_com_androidyuan_softcodec_AudioRecorder_getbuffersize(JNIEnv* env, jobject thiz){
+jint Java_io_github_brucewind_softcodec_AudioRecorder_getbuffersize(JNIEnv* env, jobject thiz){
 	int frameLength =fdkencode->info.frameLength; //每帧的长度
 	int channels = fdkencode->channels; //获取声道数。
 	int input_size = channels * 2 * frameLength; //计算每帧的大小
@@ -96,7 +96,7 @@ jint Java_com_androidyuan_softcodec_AudioRecorder_getbuffersize(JNIEnv* env, job
 	return input_size;
 }
 
-jboolean Java_com_androidyuan_softcodec_AudioRecorder_encodeFrame(JNIEnv *pEnv,jobject obj,jbyteArray pcmData) {
+jboolean Java_io_github_brucewind_softcodec_AudioRecorder_encodeFrame(JNIEnv *pEnv,jobject obj,jbyteArray pcmData) {
 
 	int nArrLen = (*pEnv)->GetArrayLength(pEnv,pcmData);
 //	if (fdkencode->input_size != nArrLen) {

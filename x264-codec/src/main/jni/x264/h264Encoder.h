@@ -13,14 +13,14 @@
  *bitrate 码率
  *fps 幀率
  */
-JNIEXPORT jlong Java_com_androidyuan_softcodec_StreamHelper_compressBegin(JNIEnv* env,
+JNIEXPORT jlong Java_io_github_brucewind_softcodec_StreamHelper_compressBegin(JNIEnv* env,
 		jobject thiz, jint width, jint height, jint bitrate, jint fps);
 
 /*compressEnd
  *結束x264编码
  *handle
  */
-JNIEXPORT jint Java_com_androidyuan_softcodec_StreamHelper_compressEnd(JNIEnv* env,
+JNIEXPORT jint Java_io_github_brucewind_softcodec_StreamHelper_compressEnd(JNIEnv* env,
 		jobject thiz, jlong handle);
 
 /*compressBegin
@@ -30,7 +30,7 @@ JNIEXPORT jint Java_com_androidyuan_softcodec_StreamHelper_compressEnd(JNIEnv* e
  *insize nv12 长度
  *out h264
  */
-JNIEXPORT jint Java_com_androidyuan_softcodec_StreamHelper_compressBuffer(JNIEnv* env,
+JNIEXPORT jint Java_io_github_brucewind_softcodec_StreamHelper_compressBuffer(JNIEnv* env,
 		jobject thiz,
 		jlong handle,
 		jbyteArray in,

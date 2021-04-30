@@ -1,1 +1,2 @@
+include ':x264-codec'
 include ':app'

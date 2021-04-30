@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">SoftCodec</string>
+    <string name="tips_cannt_connect">Cannt connect to %s</string>
+    <string name="tips_connect_successfully">connected to %s.</string>
 </resources>

@@ -1,5 +1,7 @@
 package com.androidyuan.ui;
 
+import android.widget.Toast;
+import io.github.brucewind.softcodec.RtmpHelper;
 import java.io.IOException;
 
 import android.annotation.SuppressLint;
@@ -15,7 +17,6 @@ import android.view.View;
 import android.view.WindowManager;
 
 import com.androidyuan.softcodec.R;
-import com.androidyuan.softcodec.RtmpHelper;
 
 public class MainActivity extends Activity implements SurfaceHolder.Callback,
         PreviewCallback {
@@ -29,7 +30,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
     int VideoBitrate = 512 *4;
     int fps = 60;
     RtmpHelper mRtmpHelper = new RtmpHelper();
-    private String rtmpPushUrl = "rtmp://172.26.201.159/live/live";
+    private String rtmpPushUrl = "rtmp://192.168.50.161/live/live";
     private long encoder = 0;
     private byte[] h264Buff = null;
     private int currenttime;
@@ -54,11 +55,15 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
             new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    v.setEnabled(false);
                     if (mRtmpHelper.rtmpOpen(rtmpPushUrl) > 0) {
-                        Log.d(TAG, "成功连結");
+                        Log.d(TAG, getString(R.string.tips_connect_successfully,rtmpPushUrl));
                         currenttime = (int) (System.currentTimeMillis());
                         findViewById(R.id.start).setEnabled(true);
-                        v.setEnabled(false);
+                    }
+                    else{
+                        v.setEnabled(true);
+                        Toast.makeText(MainActivity.this,getString(R.string.tips_cannt_connect,rtmpPushUrl),Toast.LENGTH_SHORT).show();
                     }
                 }
             });

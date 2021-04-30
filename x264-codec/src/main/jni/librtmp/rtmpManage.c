@@ -4,7 +4,7 @@
 /*
  *rtmp的连接
  */
-JNIEXPORT jint Java_com_androidyuan_softcodec_StreamHelper_rtmpOpen(JNIEnv *env,
+JNIEXPORT jint Java_io_github_brucewind_softcodec_StreamHelper_rtmpOpen(JNIEnv *env,
 		jobject instance, jstring url_) {
 
 	const char *url = (*env)->GetStringUTFChars(env, url_, 0);
@@ -20,7 +20,7 @@ JNIEXPORT jint Java_com_androidyuan_softcodec_StreamHelper_rtmpOpen(JNIEnv *env,
  *断开rtmp的连接
  */
 
-JNIEXPORT jint Java_com_androidyuan_softcodec_StreamHelper_rtmpStop(JNIEnv *env,
+JNIEXPORT jint Java_io_github_brucewind_softcodec_StreamHelper_rtmpStop(JNIEnv *env,
 		jobject instance) {
 
 	int result = stopRtmpConnect();

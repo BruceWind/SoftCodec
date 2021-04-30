@@ -13,8 +13,6 @@ android {
         versionCode 1
         versionName "1.0"
         ndk {
-            // Specifies the ABI configurations of your native
-            // libraries Gradle should build and package with your APK.
             abiFilters 'armeabi-v7a'
         }
     }
@@ -26,12 +24,6 @@ android {
         }
     }
 
-
-    externalNativeBuild {
-        ndkBuild {
-            path file('src/main/jni/Android.mk')
-        }
-    }
 }
 
 
@@ -39,4 +31,5 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     implementation 'com.android.support:appcompat-v7:25.0.1'
 //    implementation "com.android.support.constraint:constraint-layout:2.0.4"
+    implementation project(':x264-codec')
 }

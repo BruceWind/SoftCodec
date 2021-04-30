@@ -1,4 +1,4 @@
-package com.androidyuan.softcodec;
+package io.github.brucewind.softcodec;
 
 import java.util.Timer;
 import java.util.TimerTask;
