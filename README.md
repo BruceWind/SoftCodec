@@ -1,5 +1,9 @@
 # SoftCodec
 
-### 1.软编为H264
+- [x] 1.encode with x264.
+- [x] 2. push into rtmp server.
 
-### 2.用RTMP上传。
+
+-------------------------
+master branch has all of stable codes, If you want to look into develop code, checkout others.
+
