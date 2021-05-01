@@ -2,6 +2,7 @@ package com.androidyuan.ui;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.EditText;
 import android.widget.Toast;
 import io.github.brucewind.softcodec.RtmpHelper;
@@ -40,6 +41,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
     private int mCurrentTime;
     private int encodeTime;
 
+
+    private SurfaceView mSurfaveView;
     private EditText editText;
 
     @Override
@@ -50,9 +53,9 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
 
-        SurfaceView svCameraPreview = (SurfaceView) this
+        mSurfaveView = (SurfaceView) this
                 .findViewById(R.id.surfaceView);
-        mPreviewHolder = svCameraPreview.getHolder();
+        mPreviewHolder = mSurfaveView.getHolder();
 
         mPreviewHolder.addCallback(this);
 
@@ -136,12 +139,22 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
 
         mPreviewBuffer = new byte[frameSize + qFrameSize * 2];
 
+
+
+        LayoutParams layoutParams= mSurfaveView.getLayoutParams();
+
+        layoutParams.width = height;
+        layoutParams.height = width;
+
+        mSurfaveView.setLayoutParams(layoutParams);
+
         try {
             mCamera = Camera.open();
             mCamera.setDisplayOrientation(90);
 
             mCamera.setPreviewDisplay(mPreviewHolder);
             Camera.Parameters params = mCamera.getParameters();
+
             params.setPreviewSize(width, height);
             params.setPreviewFormat(ImageFormat.NV21);
             //自动对焦
@@ -195,9 +208,11 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
     }
 
     @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width,
-            int height) {
-        // TODO Auto-generated method stub
+    public void surfaceChanged(SurfaceHolder holder, int format,
+        int width,
+        int height) {
+        Log.w(TAG,"onSurfaceChange : "+width +"x"+ height);
+
     }
 
     @Override
