@@ -111,7 +111,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        stopCamera();
+                        stopStreaming();
                         mRtmpHelper.stopRecordeAudio();
                         v.setEnabled(false);
                         findViewById(R.id.connect).setEnabled(true);
@@ -173,14 +173,18 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
 
     }
 
-    private void stopCamera() {
+    private void stopStreaming() {
         if (mCamera != null) {
-            mRtmpHelper.rtmpStop();
-            mRtmpHelper.compressEnd(mEncoderPointer);
             mCamera.setPreviewCallback(null);
             mCamera.stopPreview();
             mCamera.release();
             mCamera = null;
+        }
+
+        if(mEncoderPointer!=0){
+            mRtmpHelper.rtmpStop();
+            mRtmpHelper.compressEnd(mEncoderPointer);
+            mEncoderPointer=0;
         }
     }
 
@@ -199,7 +203,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         // TODO Auto-generated method stub
-        stopCamera();
+        stopStreaming();
         Log.i(TAG, "surface destroyed");
     }
 

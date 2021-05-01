@@ -17,7 +17,7 @@ public class RtmpHelper {
 
   private ExecutorService mRtmpExecutor = Executors.newSingleThreadExecutor();
   private Timer mTimer;
-  private AtomicInteger mFpsAtomic = new AtomicInteger(0);
+  private final AtomicInteger mFpsAtomic = new AtomicInteger(0);
   private final StreamHelper mStreamHelper = new StreamHelper();
 
   /*rtmp*/
