@@ -1,4 +1,6 @@
-# SoftCodec
+# SoftCodec 
+
+[![Build](https://github.com/BruceWind/SoftCodec/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/BruceWind/SoftCodec/actions/workflows/build.yml)
 
 - [x] 1. encode with x264.
 - [x] 2. push into RTMP server.

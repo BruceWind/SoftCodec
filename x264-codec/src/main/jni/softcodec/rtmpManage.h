@@ -1,5 +1,5 @@
 #include <jni.h>
-#include "flvmuxer/xiecc_rtmp.h"
+#include "xiecc_rtmp.h"
 
 
 /*

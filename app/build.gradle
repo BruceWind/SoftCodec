@@ -16,7 +16,7 @@ android {
 
         //In the event that I have not written this line, so file won't packaged into apk.
         ndk {
-            abiFilters 'armeabi-v7a'
+            abiFilters 'arm64-v8a' //setting only one abi make apk smaller.
         }
     }
 

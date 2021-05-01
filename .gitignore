@@ -209,7 +209,6 @@ lint/tmp/
 # Compiled Static libraries
 *.lai
 *.la
-*.a
 *.lib
 
 # Executables
@@ -238,7 +237,6 @@ lint/tmp/
 
 # Libraries
 *.lib
-*.a
 *.la
 *.lo
 

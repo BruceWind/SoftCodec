@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <android/log.h>
 #include <stdlib.h>
-#include <x264/include/x264.h>
-#include "flvmuxer/xiecc_rtmp.h"
+#include <../libx264/include/x264.h>
+#include "xiecc_rtmp.h"
 
 /*compressBegin
  *初始化x264
