@@ -11,11 +11,9 @@
 **1. building**
 
 It depend on NDK 16, but you don't need to download manually. 
-In the time, you run `./gradlew assembleDebug` gradle will make download process automatically in the event that 
+By the time you executed `./gradlew assembleDebug`, gradle will download it automatically in the event that 
 your computer does not has NDK 16.
-
-
-
+# 
 **2. Testing with a RTMP server:**
 
 You may not have a RTMP server.
