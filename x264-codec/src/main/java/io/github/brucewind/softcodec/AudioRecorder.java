@@ -3,6 +3,7 @@ package io.github.brucewind.softcodec;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.media.MediaRecorder.AudioSource;
 import android.util.Log;
 
 /**
@@ -45,7 +46,7 @@ public class AudioRecorder {
         Log.v(TAG, "device supports minimum buffer size:" + recBufSize);
 
         // init record.
-        mAudioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,
+        mAudioRecord = new AudioRecord(AudioSource.VOICE_COMMUNICATION,//VOICE_COMMUNICATION will eliminate echo or noisy.
                 frequency,
                 channel,
                 encodingBitRate,

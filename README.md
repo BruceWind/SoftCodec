@@ -5,6 +5,8 @@
 - [x] 1. encode with x264.
 - [x] 2. push into RTMP server.
 - [ ] 3. encode with openh264.
+- [ ] 4. echo cancellation in software. Maybe need libspeex, currently has a scheme which is hardware scheme in **VOICE_COMMUNICATION**.
+
 
 ## Building & Testing 
 
@@ -18,7 +20,7 @@ your computer does not has NDK 16.
 
 You may not have a RTMP server.
 
-You need to establish a RTMP server which receives app pushed RTMP stream , and transfers stream to 
+You need to establish a RTMP server which receives app pushed RTMP stream transmits stream to 
 other players.
  
 I had written a blog to teach someone else how to establish it.
