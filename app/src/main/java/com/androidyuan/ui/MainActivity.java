@@ -156,7 +156,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
             Camera.Parameters params = mCamera.getParameters();
 
             params.setPreviewSize(width, height);
-            params.setPreviewFormat(ImageFormat.NV21);
+            params.setPreviewFormat(ImageFormat.YUV_420_888);
             //自动对焦
             if (params.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
                 params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
