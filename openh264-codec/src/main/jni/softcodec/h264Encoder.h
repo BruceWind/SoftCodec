@@ -1,5 +1,6 @@
 
 #include <stdint.h>
+#include <jni.h>
 #include <stdio.h>
 #include <android/log.h>
 #include "xiecc_rtmp.h"

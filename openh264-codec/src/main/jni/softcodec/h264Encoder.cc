@@ -1,6 +1,7 @@
+#include <string.h>
 #include "h264Encoder.h"
 
-static ISVCEncoder* 
+static ISVCEncoder* _encoder;
 static SEncParamExt param;
 
 
@@ -27,21 +28,17 @@ Java_io_github_brucewind_softcodec_StreamHelper_compressBegin(JNIEnv *env,
     param.iPicWidth = width;
     param.iPicHeight = height;
     param.iTargetBitrate = bitrate*1024;        //the input parameter need to * 1024 
-    param.iInputCsp = videoFormatI420;          //it is stable YUV format for openh264
+    //param.iInputCsp = videoFormatI420;          //it is stable YUV format for openh264
     param.bEnableDenoise = 1;                   //enable eliminating noisy.
     param.iSpatialLayerNum = 1;
-    if (sliceMode != SM_SINGLE_SLICE && sliceMode != SM_DYN_SLICE) //SM_DYN_SLICE don't support multi-thread now
+    //if (sliceMode != SM_SINGLE_SLICE && sliceMode != SM_DYN_SLICE) //SM_DYN_SLICE don't support multi-thread now
       param.iMultipleThreadIdc = 2;
     for (int i = 0; i < param.iSpatialLayerNum; i++) {
       param.sSpatialLayers[i].iVideoWidth = width >> (param.iSpatialLayerNum - 1 - i);
       param.sSpatialLayers[i].iVideoHeight = height >> (param.iSpatialLayerNum - 1 - i);
       param.sSpatialLayers[i].fFrameRate = fps;
       param.sSpatialLayers[i].iSpatialBitrate = param.iTargetBitrate;
-      param.sSpatialLayers[i].sSliceCfg.uiSliceMode = sliceMode;
-      if (sliceMode == SM_DYN_SLICE) {
-        param.sSpatialLayers[i].sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 600;
-        param.uiMaxNalSize = 1500;
-      }
+      //param.sSpatialLayers[i].sSliceCfg.uiSliceMode = sliceMode;
     }
     param.iTargetBitrate *= param.iSpatialLayerNum;
     int inited_status = encoder->InitializeExt (&param);
@@ -88,7 +85,7 @@ JNIEXPORT jint Java_io_github_brucewind_softcodec_StreamHelper_compressBuffer(
 
 
   int width = param.iPicWidth;
-  int height = param.iPicHeight
+  int height = param.iPicHeight;
 
 
   //find initialized encode by pointer address.
@@ -101,10 +98,10 @@ JNIEXPORT jint Java_io_github_brucewind_softcodec_StreamHelper_compressBuffer(
   int i_frame_size = 0;
   int j = 0;
   int nPix = 0;
-
-  jbyte *nv12_buf = (jbyte *) (*env)->GetByteArrayElements(env, in, 0);
-  jbyte *h264_buf = (jbyte *) (*env)->GetByteArrayElements(env, out, 0);
-  unsigned char *pTemp = h264_buf;
+//  jbyte *c_array = env->GetByteArrayElements(j_array, 0);
+  jbyte *nv12_buf = (jbyte *) env->GetByteArrayElements(in, 0);
+  jbyte *h264_buf = (jbyte *) env->GetByteArrayElements(out, 0);
+  unsigned char *pTemp = (unsigned char *)h264_buf;
   int nPicSize = width * height;
 
 
@@ -127,7 +124,7 @@ JNIEXPORT jint Java_io_github_brucewind_softcodec_StreamHelper_compressBuffer(
   pic.pData[2] = pic.pData[1] + (width * height >> 2);
   
   //prepare input data
-  rv = encoder_->EncodeFrame (&pic, &info);
+  int rv = _encoder->EncodeFrame (&pic, &info);
   if(rv != cmResultSuccess){//failed.
     return -1;
   }

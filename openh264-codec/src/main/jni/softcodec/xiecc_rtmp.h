@@ -4,10 +4,12 @@
 
 #ifndef _XIECC_RTMP_H_
 #define _XIECC_RTMP_H_
+#include <../libopenh264/include/wels/codec_def.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <time.h>
 
 #ifdef __cplusplus
 extern "C"{
@@ -22,6 +24,8 @@ static int getSystemTime() {
 	t += tv.tv_usec / 1000;
 	return t;
 }
+
+int isConnected();
 
 int rtmp_open_for_write(const char * url);
 
