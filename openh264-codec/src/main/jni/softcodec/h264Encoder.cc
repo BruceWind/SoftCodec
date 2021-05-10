@@ -1,4 +1,4 @@
-#include <string.h>
+
 #include "h264Encoder.h"
 
 static ISVCEncoder* _encoder;
@@ -12,7 +12,7 @@ int sps_len;
 int pps_len;
 
 #define RC_MARGIN 10000 /*bits per sec*/
-JNIEXPORT jlong
+extern "C" JNIEXPORT  jlong
 Java_io_github_brucewind_softcodec_StreamHelper_compressBegin(JNIEnv *env,
                                                               jobject thiz,
                                                               jint width,
@@ -56,7 +56,7 @@ Java_io_github_brucewind_softcodec_StreamHelper_compressBegin(JNIEnv *env,
 /**
  * When compress end, clear some resource
  */
-JNIEXPORT jint
+extern "C" JNIEXPORT  jint
 Java_io_github_brucewind_softcodec_StreamHelper_compressEnd(
     JNIEnv *env,
     jobject thiz,
@@ -71,7 +71,7 @@ Java_io_github_brucewind_softcodec_StreamHelper_compressEnd(
  * 1. compressing the buffer data into serveral NALUs;
  * 2. transferring the NALUs to RTMP server.
  */
-JNIEXPORT jint Java_io_github_brucewind_softcodec_StreamHelper_compressBuffer(
+extern "C" JNIEXPORT  jint Java_io_github_brucewind_softcodec_StreamHelper_compressBuffer(
     JNIEnv *env,
     jobject thiz,
     jlong handler,//it is a pointer.
@@ -113,13 +113,13 @@ JNIEXPORT jint Java_io_github_brucewind_softcodec_StreamHelper_compressBuffer(
   SFrameBSInfo info;
   memset (&info, 0, sizeof (SFrameBSInfo));
   SSourcePicture pic;
-  memset (&pic, 0, sizeof (SsourcePicture));
+  memset (&pic, 0, sizeof (SSourcePicture));
   pic.iPicWidth = width;
   pic.iPicHeight = height;
   pic.iColorFormat = videoFormatI420;
   pic.iStride[0] = pic.iPicWidth;
   pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
-  pic.pData[0] = nv12_buf;
+  pic.pData[0] = reinterpret_cast<unsigned char *>(nv12_buf);
   pic.pData[1] = pic.pData[0] + width * height;
   pic.pData[2] = pic.pData[1] + (width * height >> 2);
   
@@ -155,16 +155,15 @@ JNIEXPORT jint Java_io_github_brucewind_softcodec_StreamHelper_compressBuffer(
 //      }
 //    } else
     {
+      int val = (uintptr_t)info.sLayerInfo[i].pNalLengthInByte;//__uintptr_t to fix build err.
       send_rtmp_video(info.sLayerInfo[i].pBsBuf,
-                      &(info.sLayerInfo[i].pNalLengthInByte),
+                      val,
                       getSystemTime());     //into.uiTimeStamp
     }
-    pTemp += en->nal[i].i_payload;
-    result += en->nal[i].i_payload;
 
     //release buffers.
-    (*env)->ReleaseByteArrayElements(env, in, nv12_buf, 0);
-    (*env)->ReleaseByteArrayElements(env, out, h264_buf, 0);
+    env->ReleaseByteArrayElements(in, nv12_buf, 0);
+    env->ReleaseByteArrayElements(out, h264_buf, 0);
   }
   return result;
 }

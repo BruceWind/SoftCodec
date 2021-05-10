@@ -6,7 +6,7 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
-
+LOCAL_CPPFLAGS +=  -O3 -std=c++11
 LOCAL_MODULE    := softcodec
 LOCAL_SHARED_LIBRARIES := libopenh264  \
 							librtmp \

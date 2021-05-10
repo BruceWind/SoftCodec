@@ -1,5 +1,4 @@
 #include <jni.h>
-#include "xiecc_rtmp.h"
 
 
 /*

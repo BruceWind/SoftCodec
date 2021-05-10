@@ -5,7 +5,8 @@ android {
     buildToolsVersion "24.0.3"
 
     //If I don't write this line, C codes will build with latest version of NDK.
-    ndkVersion "16.1.4479499"
+//    ndkVersion "16.1.4479499"
+    ndkVersion "21.4.7075529"
 
     defaultConfig {
         applicationId "com.androidyuan.softcodec"
@@ -16,7 +17,7 @@ android {
 
         //In the event that I have not written this line, so file won't packaged into apk.
         ndk {
-            abiFilters 'x86' //setting only one abi make apk smaller.
+            abiFilters 'arm64-v8a','x86' //setting only one abi make apk smaller.
         }
     }
 

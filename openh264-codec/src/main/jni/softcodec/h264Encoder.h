@@ -1,7 +1,8 @@
 
-#include <stdint.h>
+#include <string.h>
 #include <jni.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <android/log.h>
 #include "xiecc_rtmp.h"
 #include "../libopenh264/include/wels/codec_app_def.h"
@@ -9,18 +10,18 @@
 #include "h264_encoder_log.h"
 
 
-JNIEXPORT jlong
+extern "C" JNIEXPORT jlong
 Java_io_github_brucewind_softcodec_StreamHelper_compressBegin(JNIEnv * env ,
 jobject thiz, jint
 width , jint height, jint
 bitrate , jint fps);
 
-JNIEXPORT jint
+extern "C" JNIEXPORT jint
 Java_io_github_brucewind_softcodec_StreamHelper_compressEnd(JNIEnv * env ,
 jobject thiz, jlong
 handle );
 
-JNIEXPORT jint
+extern "C" JNIEXPORT jint
 Java_io_github_brucewind_softcodec_StreamHelper_compressBuffer(JNIEnv * env ,
 jobject thiz,
     jlong
