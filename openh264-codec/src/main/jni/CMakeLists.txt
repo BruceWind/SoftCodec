@@ -17,24 +17,7 @@ set_target_properties(libopenh264 PROPERTIES IMPORTED_LOCATION ${distribution_DI
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libopenh264/include/wels)
 ###------libopenh264 end --------
 
-###------librtmp begin--------
-#add_library(librtmp STATIC IMPORTED)
-#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/librtmp)
-
-#add_library(
-#        librtmp  STATIC
-#        # source files
-#        librtmp/amf.c
-#        librtmp/hashswf.c
-#        librtmp/log.c
-#        librtmp/parseurl.c
-#        librtmp/rtmp.c)
-
-
 set(RTMP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/librtmp)
-#add_library(librtmp STATIC IMPORTED)
-#include_directories( ${RTMP_DIR} )
-###------librtmp end --------
 
 
 add_library(

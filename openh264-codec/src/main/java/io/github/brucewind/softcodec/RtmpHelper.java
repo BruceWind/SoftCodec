@@ -15,6 +15,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class RtmpHelper {
 
+  private static String LOGTAG="LiveCamera_encoder";
+
   private ExecutorService mRtmpExecutor = Executors.newSingleThreadExecutor();
   private Timer mTimer;
   private final AtomicInteger mFpsAtomic = new AtomicInteger(0);
@@ -26,7 +28,7 @@ public class RtmpHelper {
     mTimer.schedule(new TimerTask() {
       @Override
       public void run() {
-        Log.d("RtmpHelper", "fps = " + mFpsAtomic.get());
+        Log.d(LOGTAG, "fps = " + mFpsAtomic.get());
         mFpsAtomic.set(0);
       }
     }, 1000, 1000);
@@ -64,6 +66,8 @@ public class RtmpHelper {
     mRtmpExecutor.execute(new Runnable() {
       @Override
       public void run() {
+
+        Log.d(LOGTAG, "compressBuffer("+NV12size+")");
         mStreamHelper.compressBuffer(encoder, NV12, NV12size, H264);
         mFpsAtomic.incrementAndGet();
       }

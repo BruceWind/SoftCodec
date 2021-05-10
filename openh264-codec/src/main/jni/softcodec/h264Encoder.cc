@@ -23,12 +23,13 @@ Java_io_github_brucewind_softcodec_StreamHelper_compressBegin(JNIEnv *env,
   ISVCEncoder* encoder;
   WelsCreateSVCEncoder(&encoder);
   encoder->GetDefaultParams (&param);
-    param.iUsageType = CAMERA_VIDEO_REAL_TIME;
+    param.iUsageType = CAMERA_VIDEO_REAL_TIME;  //tell openH264 steam type is LIVE.
+    param.iRCMode    = RC_QUALITY_MODE;
     param.fMaxFrameRate = fps;                  //fps
     param.iPicWidth = width;
     param.iPicHeight = height;
     param.iTargetBitrate = bitrate*1024;        //the input parameter need to * 1024 
-    //param.iInputCsp = videoFormatI420;          //it is stable YUV format for openh264
+//    param.iInputCsp = videoFormatI420;          //it is stable YUV format for openh264
     param.bEnableDenoise = 1;                   //enable eliminating noisy.
     param.iSpatialLayerNum = 1;
     //if (sliceMode != SM_SINGLE_SLICE && sliceMode != SM_DYN_SLICE) //SM_DYN_SLICE don't support multi-thread now
@@ -116,7 +117,7 @@ extern "C" JNIEXPORT  jint Java_io_github_brucewind_softcodec_StreamHelper_compr
   memset (&pic, 0, sizeof (SSourcePicture));
   pic.iPicWidth = width;
   pic.iPicHeight = height;
-  pic.iColorFormat = videoFormatI420;
+  pic.iColorFormat = videoFormatYV12;//this value same as MainActivity.
   pic.iStride[0] = pic.iPicWidth;
   pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
   pic.pData[0] = reinterpret_cast<unsigned char *>(nv12_buf);
@@ -126,13 +127,21 @@ extern "C" JNIEXPORT  jint Java_io_github_brucewind_softcodec_StreamHelper_compr
   //prepare input data
   int rv = _encoder->EncodeFrame (&pic, &info);
   if(rv != cmResultSuccess){//failed.
+    if(rv==cmInitParaError){
+      ALOGE("openh264 parameter is wrong.");
+    }
+    else{
+      ALOGE("encodeFrame falied, the result is %d.",rv);
+    }
     return -1;
   }
   if (info.eFrameType == videoFrameTypeSkip) {//it need to skip.
-        return 0;
+    ALOGW("skip this frame");
+    return 0;
   }
 
   if (i_frame_size < 0) {
+    ALOGE("something wrong in \"i_frame_size < 0\".");
     return -1;
   }
 
@@ -159,6 +168,7 @@ extern "C" JNIEXPORT  jint Java_io_github_brucewind_softcodec_StreamHelper_compr
       send_rtmp_video(info.sLayerInfo[i].pBsBuf,
                       val,
                       getSystemTime());     //into.uiTimeStamp
+      ALOGW("send_rtmp_video()");
     }
 
     //release buffers.
