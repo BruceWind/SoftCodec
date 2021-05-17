@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class RtmpHelper {
 
-  private static String LOGTAG="LiveCamera_encoder";
+  private static String LOGTAG="JLiveCamera_encoder";
 
   private ExecutorService mRtmpExecutor = Executors.newSingleThreadExecutor();
   private Timer mTimer;

@@ -5,6 +5,7 @@
 #include <android/log.h>
 #include "xiecc_rtmp.h"
 #include <android/log.h>
+#include <inttypes.h>
 
 #define RTMP_HEAD_SIZE (sizeof(RTMPPacket)+RTMP_MAX_HEADER_SIZE)
 
@@ -107,12 +108,16 @@ void send_video_sps_pps(uint8_t *sps, int sps_len, uint8_t *pps, int pps_len) {
 		free(packet);
 	}
 }
-void send_rtmp_video(uint8_t *data, int data_len, int timestamp) {
+void send_rtmp_video(uint8_t *data, uint32_t data_len, int timestamp) {
 	int type;
 	RTMPPacket * packet;
 	unsigned char * body;
 	unsigned char* buffer = data;
 	uint32_t length = data_len;
+
+	if(length < 0 || length>1024*1024*1){
+		LOGE("data_len is %" PRIu32 ".",length);
+	}
 
 	if (rtmp != NULL) {
 		timestamp = timestamp - StartTime;
@@ -124,16 +129,18 @@ void send_rtmp_video(uint8_t *data, int data_len, int timestamp) {
 			buffer += 3;
 			length -= 3;
 		}
+		else{
+			LOGE("start code not found.");
+		}
 		type = buffer[0] & 0x1f;
-
 		packet = (RTMPPacket *) malloc(RTMP_HEAD_SIZE + length + 9);
 		memset(packet, 0, RTMP_HEAD_SIZE);
 
 		packet->m_body = (char *) packet + RTMP_HEAD_SIZE;
 		packet->m_nBodySize = length + 9;
-
 		/*send video packet*/
 		body = (unsigned char *) packet->m_body;
+		LOGD("data len: %" PRIu32 ".",length);
 		memset(body, 0, length + 9);
 
 		/*key frame*/
@@ -142,7 +149,6 @@ void send_rtmp_video(uint8_t *data, int data_len, int timestamp) {
 				{
 			body[0] = 0x17;
 		}
-
 		body[1] = 0x01; /*nal unit*/
 		body[2] = 0x00;
 		body[3] = 0x00;

@@ -6,6 +6,8 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.EditText;
 import android.widget.Toast;
 import io.github.brucewind.softcodec.RtmpHelper;
+import io.github.brucewind.softcodec.YUVHelper;
+
 import java.io.IOException;
 
 import android.annotation.SuppressLint;
@@ -22,6 +24,8 @@ import android.view.WindowManager;
 
 import com.androidyuan.softcodec.R;
 
+import junit.framework.Assert;
+
 public class MainActivity extends Activity implements SurfaceHolder.Callback,
         PreviewCallback {
     private static final String TAG = "MainActivity";
@@ -35,7 +39,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
     private final int VIDEOBITRATE = 512 *4;
     private final int FPS = 60;
     private RtmpHelper mRtmpHelper = new RtmpHelper();
-    private String mRtmpPushUrl = "rtmp://172.26.201.159/live/live";
+    private String mRtmpPushUrl = "rtmp://192.168.50.14/live/live";
     private long mEncoderPointer = 0;
     private byte[] mH264Buff = null;
     private int mCurrentTime;
@@ -127,6 +131,10 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
     private void startCamera() {
 
         mEncoderPointer = mRtmpHelper.compressBegin(width, height, VIDEOBITRATE, FPS);
+        if(mEncoderPointer==0){
+            Toast.makeText(this,"encoder init error.",Toast.LENGTH_LONG).show();
+            return;
+        }
 
         mH264Buff = new byte[width * height * 8];
 
@@ -156,7 +164,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
             Camera.Parameters params = mCamera.getParameters();
 
             params.setPreviewSize(width, height);
-            params.setPreviewFormat(ImageFormat.YV12);//may selected codec not support this format.
+            params.setPreviewFormat(ImageFormat.NV21);//may selected codec not support this format.
             //自动对焦
             if (params.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
                 params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
@@ -172,16 +180,20 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
         }
     }
 
+
+
+
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
         // TODO Auto-generated method stub
 
         mCamera.addCallbackBuffer(mPreviewBuffer);
-
+        byte[] i420bytes = YUVHelper.nv21ToI420(data, width, height);
+        Assert.assertEquals(i420bytes.length,data.length);
 
         int result = mRtmpHelper.compressBuffer(mEncoderPointer,
-                data,
-                data.length,
+                i420bytes,
+                i420bytes.length,
             mH264Buff);
 
     }

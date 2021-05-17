@@ -31,7 +31,7 @@ int rtmp_open_for_write(const char * url);
 
 void send_video_sps_pps(uint8_t *sps,int sps_len,uint8_t *pps,int pps_len);
 
-void send_rtmp_video(uint8_t *data, int data_len,int timestamp) ;
+void send_rtmp_video(uint8_t *data, uint32_t data_len,int timestamp) ;
 
 void send_rtmp_audio_spec(unsigned char *spec_buf, uint32_t spec_len);
 
