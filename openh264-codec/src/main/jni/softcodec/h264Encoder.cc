@@ -1,6 +1,7 @@
 
 #include "h264Encoder.h"
-
+#include <iostream>
+#include <string>
 static ISVCEncoder *_encoder;
 static SEncParamExt param;
 
@@ -63,14 +64,16 @@ Java_io_github_brucewind_softcodec_StreamHelper_compressEnd(
         jobject thiz,
         jlong handle
 ) {
-
+    first = 0;
     return 0;
 }
 
+using namespace std;
 /**
  * There are two steps:
  * 1. compressing the buffer data into serveral NALUs;
  * 2. transferring the NALUs to RTMP server.
+ * return 0 means everything is ok.
  */
 extern "C" JNIEXPORT  jint Java_io_github_brucewind_softcodec_StreamHelper_compressBuffer(
         JNIEnv *env,
@@ -106,7 +109,36 @@ extern "C" JNIEXPORT  jint Java_io_github_brucewind_softcodec_StreamHelper_compr
     int nPicSize = width * height;
 
 
-    //1. the first step: encode YUV420 into H264 NALUs.
+    //1. the first step: encode header with PPS & SPS.
+    if(first == 0) {
+        SFrameBSInfo fbi = {0};
+        int pps_suc = _encoder->EncodeParameterSets(&fbi);
+        if (pps_suc != 0) {
+            ALOGE("PPS & SPS encoding got failed.");
+            return -1;
+        }
+
+        fbi.sLayerInfo[0].pBsBuf+=4;
+        unsigned char* sps_raw = fbi.sLayerInfo[0].pBsBuf;
+        const auto sps_len =fbi.sLayerInfo[0].pNalLengthInByte[0]-4;
+        fbi.sLayerInfo[0].pBsBuf+=sps_len;
+        ALOGI("sLayerInfo[0].iNalCount :%d", fbi.sLayerInfo[0].iNalCount);
+        if(fbi.sLayerInfo[0].iNalCount>1){
+            fbi.sLayerInfo[0].pBsBuf+=4;
+            unsigned char* pps_raw = fbi.sLayerInfo[0].pBsBuf;
+            const auto pps_len =fbi.sLayerInfo[0].pNalLengthInByte[1]-4;
+
+            ALOGD("SPS len: %d , PPS len: %d .",sps_len,pps_len);
+            send_video_sps_pps(sps_raw,sps_len,pps_raw,pps_len);
+            first = 1;
+        }
+        else{
+            ALOGE("Reject: there is no PPS NAL.");
+            return -1;
+        }
+
+    }
+
 
     //encode and  store ouput bistream
     int frameSize = width * height * 3 / 2;
@@ -134,11 +166,17 @@ extern "C" JNIEXPORT  jint Java_io_github_brucewind_softcodec_StreamHelper_compr
         }
         return -1;
     }
-    if (info.eFrameType == videoFrameTypeSkip) {//it need to skip.
-        ALOGW("skip this frame");
+
+    if(info.eFrameType == videoFrameTypeInvalid){
+        ALOGE("videoFrameTypeInvalid");
         return 0;
-    } else {
-        ALOGD("it has encoded a frame.");
+    }
+//    else if (info.eFrameType == videoFrameTypeSkip) {//it need to skip.
+//        ALOGW("skip this frame");
+//        return 0;
+//    }
+    else {
+        ALOGD("foreach NAL type : %d., laytype is %d.", info.sLayerInfo[i].eFrameType,info.sLayerInfo[i].uiLayerType);
     }
 
     if (info.iLayerNum <= 0) {
@@ -152,28 +190,19 @@ extern "C" JNIEXPORT  jint Java_io_github_brucewind_softcodec_StreamHelper_compr
      * Two NAL types : SPS & PPS are very important.
      */
     for (i = 0; i < info.iLayerNum; i++) {//iLayerNum is the count of  NALUs.
-        int type = info.sLayerInfo[i].uiLayerType;
-        if (type != 1) {
-            ALOGD("foreach NAL type : %d.", info.sLayerInfo[i].uiLayerType);
+        int type = info.sLayerInfo[i].eFrameType;//it is NON_VIDEO_CODING_LAYER
+
+        if (info.sLayerInfo[i].uiLayerType == NON_VIDEO_CODING_LAYER) {//this NAL type is SPS.
+
         }
-        if (info.sLayerInfo[i].uiLayerType == NAL_SPS) {//this NAL type is SPS.
-            ALOGD("got SPS.");
-//      sps_len = en->nal[i].i_payload - 4;
-//      memcpy(sps, en->nal[i].p_payload + 4, sps_len);
-        } else if (info.sLayerInfo[i].uiLayerType == NAL_PPS) {//this NAL type is PPS.
-            ALOGD("got PPS.");
-//      pps_len = en->nal[i].i_payload - 4;
-//      memcpy(pps, en->nal[i].p_payload + 4, pps_len);
-//      if (first == 0) {
-//        send_video_sps_pps(sps, sps_len, pps, pps_len);
-//        first = 1;
-//      }
-        } else {//TODO
-      send_rtmp_video(info.sLayerInfo[i].pBsBuf,
-                      info.sLayerInfo[i].pNalLengthInByte[0],
-                      getSystemTime());     //into.uiTimeStamp
-            ALOGD("send_rtmp_video() end");
+        else {//TODO
+
         }
+
+        send_rtmp_video(info.sLayerInfo[i].pBsBuf,
+                        info.sLayerInfo[i].pNalLengthInByte[0],
+                        getSystemTime());     //into.uiTimeStamp
+        ALOGD("send_rtmp_video() end");
 
         //release buffers.
         env->ReleaseByteArrayElements(in, nv12_buf, 0);

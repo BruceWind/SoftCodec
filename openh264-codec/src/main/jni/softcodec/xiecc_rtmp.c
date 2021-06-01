@@ -47,6 +47,15 @@ int rtmp_open_for_write(const char * url) {
 
 	return 1;
 }
+
+
+/**
+ *
+ * @param sps must be without start code.
+ * @param sps_len
+ * @param pps must be without start code.
+ * @param pps_len
+ */
 void send_video_sps_pps(uint8_t *sps, int sps_len, uint8_t *pps, int pps_len) {
 	RTMPPacket * packet;
 	unsigned char * body;
@@ -58,12 +67,12 @@ void send_video_sps_pps(uint8_t *sps, int sps_len, uint8_t *pps, int pps_len) {
 		packet->m_body = (char *) packet + RTMP_HEAD_SIZE;
 		body = (unsigned char *) packet->m_body;
 		i = 0;
-		body[i++] = 0x17;
-		body[i++] = 0x00;
+		body[i++] = 0x17;//0
+		body[i++] = 0x00;//1
 
-		body[i++] = 0x00;
-		body[i++] = 0x00;
-		body[i++] = 0x00;
+		body[i++] = 0x00;//2
+		body[i++] = 0x00;//3
+		body[i++] = 0x00;//4
 
 		/*AVCDecoderConfigurationRecord*/
 		body[i++] = 0x01;

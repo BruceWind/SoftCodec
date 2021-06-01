@@ -181,7 +181,7 @@ JNIEXPORT jint Java_io_github_brucewind_softcodec_StreamHelper_compressBuffer(
 
   /**
    * 2. The second step:
-   * transfer serveral NALUs to RTMP server with foreach.
+   * transfer several NALUs to RTMP server with foreach.
    * Two NAL types : SPS & PPS are very important.
    */
   for (i = 0; i < count_of_NALU; i++) {
