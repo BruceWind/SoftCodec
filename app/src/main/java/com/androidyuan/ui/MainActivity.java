@@ -33,7 +33,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
     Camera mCamera;
     SurfaceHolder mPreviewHolder;
     byte[] mPreviewBuffer;
-    //TODO get the compatible size from camera.
+    //TODO obtain the a compatible set of size from camera.
     int width = 640;
     int height = 480;
     private final int VIDEOBITRATE = 512 *4;

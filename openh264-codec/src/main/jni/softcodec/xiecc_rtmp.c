@@ -142,6 +142,9 @@ void send_rtmp_video(uint8_t *data, uint32_t data_len, int timestamp) {
 			LOGE("start code not found.");
 		}
 		type = buffer[0] & 0x1f;
+		if(type>1) {
+            LOGE("this type is %d.", type);
+        }
 		packet = (RTMPPacket *) malloc(RTMP_HEAD_SIZE + length + 9);
 		memset(packet, 0, RTMP_HEAD_SIZE);
 

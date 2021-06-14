@@ -2,15 +2,52 @@
 #include "h264Encoder.h"
 #include <iostream>
 #include <string>
+#include "print_hex.h"
+
 static ISVCEncoder *_encoder;
 static SEncParamExt param;
 
-
-unsigned char sps[30];
-unsigned char pps[10];
-int first = 0;
+unsigned char *sps;
+unsigned char *pps;
 int sps_len;
 int pps_len;
+
+/**
+ *
+ * @param NAL_type
+ * @param buffer , must not begin with start-code such as "00 00 00 01"
+ * @param len
+ * @return
+ */
+int handle_sps_pps(int NAL_type, unsigned char *buffer, int len) {
+    if (buffer[0] == 0) {
+        ALOGE("buffer format is wrong.");
+        return -1;
+    }
+    if (NAL_type == 7) {
+        sps = buffer;
+        sps_len = len;
+        print_hex("SPS", sps, sps_len);
+    } else if (NAL_type == 8) {
+        pps = buffer;
+        pps_len = len;
+        send_video_sps_pps(sps, sps_len, pps, pps_len);
+        print_hex("PPS", pps, pps_len);// print
+    } else {
+        ALOGE("It is not either SPS or PPS.");
+        return -1;
+    }
+
+    return 0;
+}
+
+int handle_other_NAL(unsigned char *buffer, int len) {
+
+    send_rtmp_video(buffer,
+                    len,
+                    getSystemTime());     //into.uiTimeStamp
+    return 0;
+}
 
 #define RC_MARGIN 10000 /*bits per sec*/
 extern "C" JNIEXPORT  jlong
@@ -35,7 +72,7 @@ Java_io_github_brucewind_softcodec_StreamHelper_compressBegin(JNIEnv *env,
     param.bEnableDenoise = 1;                   //enable eliminating noisy.
     param.iSpatialLayerNum = 1;
     //if (sliceMode != SM_SINGLE_SLICE && sliceMode != SM_DYN_SLICE) //SM_DYN_SLICE don't support multi-thread now
-    param.iMultipleThreadIdc = 2;
+//    param.iMultipleThreadIdc = 2;
     for (int i = 0; i < param.iSpatialLayerNum; i++) {
         param.sSpatialLayers[i].iVideoWidth = width >> (param.iSpatialLayerNum - 1 - i);
         param.sSpatialLayers[i].iVideoHeight = height >> (param.iSpatialLayerNum - 1 - i);
@@ -64,7 +101,6 @@ Java_io_github_brucewind_softcodec_StreamHelper_compressEnd(
         jobject thiz,
         jlong handle
 ) {
-    first = 0;
     return 0;
 }
 
@@ -96,7 +132,7 @@ extern "C" JNIEXPORT  jint Java_io_github_brucewind_softcodec_StreamHelper_compr
     ISVCEncoder *en = (ISVCEncoder *) _encoder;
 
     int i_data = 0;
-    int count_of_NALU = -1;//A frame may be separated into saveral NALU.
+    int count_of_NALU = -1;//A frame may be separated into several NALUs.
     int result = 0;
     int i = 0;
     int i_frame_size = 0;
@@ -110,34 +146,17 @@ extern "C" JNIEXPORT  jint Java_io_github_brucewind_softcodec_StreamHelper_compr
 
 
     //1. the first step: encode header with PPS & SPS.
-    if(first == 0) {
-        SFrameBSInfo fbi = {0};
-        int pps_suc = _encoder->EncodeParameterSets(&fbi);
-        if (pps_suc != 0) {
-            ALOGE("PPS & SPS encoding got failed.");
-            return -1;
-        }
+//    if (first == 0) {
+//        SFrameBSInfo fbi = {0};
+//        int pps_suc = _encoder->EncodeParameterSets(&fbi);
+//        if (pps_suc != 0) {
+//            ALOGE("PPS & SPS encoding got failed.");
+//            return -1;
+//        }
+//
+//        handle_sps_pps(fbi);
 
-        fbi.sLayerInfo[0].pBsBuf+=4;
-        unsigned char* sps_raw = fbi.sLayerInfo[0].pBsBuf;
-        const auto sps_len =fbi.sLayerInfo[0].pNalLengthInByte[0]-4;
-        fbi.sLayerInfo[0].pBsBuf+=sps_len;
-        ALOGI("sLayerInfo[0].iNalCount :%d", fbi.sLayerInfo[0].iNalCount);
-        if(fbi.sLayerInfo[0].iNalCount>1){
-            fbi.sLayerInfo[0].pBsBuf+=4;
-            unsigned char* pps_raw = fbi.sLayerInfo[0].pBsBuf;
-            const auto pps_len =fbi.sLayerInfo[0].pNalLengthInByte[1]-4;
-
-            ALOGD("SPS len: %d , PPS len: %d .",sps_len,pps_len);
-            send_video_sps_pps(sps_raw,sps_len,pps_raw,pps_len);
-            first = 1;
-        }
-        else{
-            ALOGE("Reject: there is no PPS NAL.");
-            return -1;
-        }
-
-    }
+//    }
 
 
     //encode and  store ouput bistream
@@ -166,23 +185,24 @@ extern "C" JNIEXPORT  jint Java_io_github_brucewind_softcodec_StreamHelper_compr
         }
         return -1;
     }
-
-    if(info.eFrameType == videoFrameTypeInvalid){
-        ALOGE("videoFrameTypeInvalid");
-        return 0;
-    }
-//    else if (info.eFrameType == videoFrameTypeSkip) {//it need to skip.
-//        ALOGW("skip this frame");
-//        return 0;
-//    }
-    else {
-        ALOGD("foreach NAL type : %d., laytype is %d.", info.sLayerInfo[i].eFrameType,info.sLayerInfo[i].uiLayerType);
-    }
-
     if (info.iLayerNum <= 0) {
         ALOGE("something wrong in \"i_frame_size < 0\".");
         return -1;
     }
+    if (info.iLayerNum > 1) {
+        ALOGI("data lost due to that iLayerNum=%d.", info.iLayerNum);
+    }
+    if (info.eFrameType == videoFrameTypeInvalid) {
+        ALOGE("videoFrameTypeInvalid");
+        return 0;
+    } else if (info.eFrameType == videoFrameTypeSkip) {//it need to skip.
+        ALOGW("skip this frame");
+        return 0;
+    } else {
+        ALOGD("foreach NAL type : %d., laytype is %d.", info.sLayerInfo[i].eFrameType,
+              info.sLayerInfo[i].uiLayerType);
+    }
+
 
     /**
      * 2. The second step:
@@ -190,18 +210,41 @@ extern "C" JNIEXPORT  jint Java_io_github_brucewind_softcodec_StreamHelper_compr
      * Two NAL types : SPS & PPS are very important.
      */
     for (i = 0; i < info.iLayerNum; i++) {//iLayerNum is the count of  NALUs.
-        int type = info.sLayerInfo[i].eFrameType;//it is NON_VIDEO_CODING_LAYER
+//        int type = info.sLayerInfo[i].eFrameType;//it is NON_VIDEO_CODING_LAYER
+//
+//        if (info.sLayerInfo[i].uiLayerType == NON_VIDEO_CODING_LAYER) {//this NAL type is SPS.
+//        }
+        const SLayerBSInfo layerInfo = info.sLayerInfo[i];
+        unsigned char *buffer = layerInfo.pBsBuf;
+        for (auto index_nal = 0; index_nal < layerInfo.iNalCount; index_nal++) {
 
-        if (info.sLayerInfo[i].uiLayerType == NON_VIDEO_CODING_LAYER) {//this NAL type is SPS.
-
+            const int buf_len = layerInfo.pNalLengthInByte[index_nal];
+            //detect NAL
+            int NAL_type = 0;
+            int start_len = 0;
+            if (buffer[2] == 0x00) { /*00 00 00 01*/
+                NAL_type = buffer[4] & 0x1f;
+                start_len = 4;
+            } else if (buffer[2] == 0x01) { /*00 00 01*/
+                NAL_type = buffer[3] & 0x1f;
+                start_len = 3;
+            } else {
+                if (buffer[0] != 0) {
+                    NAL_type = buffer[0] & 0x1f;
+                } else {
+                    result = 1;
+                    ALOGE("start code not found.");
+                }
+            }
+            if (NAL_type == 7 || NAL_type == 8) {
+                buffer += start_len;
+                handle_sps_pps(NAL_type, buffer, buf_len - start_len);
+                buffer+=(buf_len - start_len);
+            } else {
+                handle_other_NAL(buffer, buf_len);
+                buffer += buf_len;
+            }
         }
-        else {//TODO
-
-        }
-
-        send_rtmp_video(info.sLayerInfo[i].pBsBuf,
-                        info.sLayerInfo[i].pNalLengthInByte[0],
-                        getSystemTime());     //into.uiTimeStamp
         ALOGD("send_rtmp_video() end");
 
         //release buffers.

@@ -29,6 +29,7 @@ add_library(
         softcodec/aacEncode.c
         softcodec/h264Encoder.cc
         softcodec/h264Encoder.h
+        softcodec/print_hex.cc
 
         # import lib rtmp code source.
         ${RTMP_DIR}/amf.c
