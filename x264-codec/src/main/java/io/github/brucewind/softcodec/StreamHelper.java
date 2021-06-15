@@ -1,7 +1,7 @@
 package io.github.brucewind.softcodec;
 
 /**
- * Created by wei on 16-11-24.
+ * Created by bruce on 16-11-24.
  * It is used to connect server and push stream.
  */
 class StreamHelper {

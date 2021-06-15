@@ -24,11 +24,11 @@ int handle_sps_pps(int NAL_type, unsigned char *buffer, int len) {
         ALOGE("buffer format is wrong.");
         return -1;
     }
-    if (NAL_type == 7) {
+    if (NAL_type == NAL_SPS) {
         sps = buffer;
         sps_len = len;
         print_hex("SPS", sps, sps_len);
-    } else if (NAL_type == 8) {
+    } else if (NAL_type == NAL_PPS) {
         pps = buffer;
         pps_len = len;
         send_video_sps_pps(sps, sps_len, pps, pps_len);
@@ -63,16 +63,16 @@ Java_io_github_brucewind_softcodec_StreamHelper_compressBegin(JNIEnv *env,
     encoder->GetDefaultParams(
             &param);//call InitializeExt must have a extension parameter with this default.
     param.iUsageType = CAMERA_VIDEO_REAL_TIME;  //tell openH264 steam type is LIVE.
-    param.iRCMode = RC_QUALITY_MODE;
+    param.iRCMode = RC_BITRATE_MODE;
     param.fMaxFrameRate = fps;                  //fps
     param.iPicWidth = width;
     param.iPicHeight = height;
     param.iTargetBitrate = bitrate * 1024;        //the input parameter need to * 1024
 //    param.iInputCsp = videoFormatI420;          //it is stable YUV format for openh264
-    param.bEnableDenoise = 1;                   //enable eliminating noisy.
+//    param.bEnableDenoise = 1;                   //enable eliminating noisy.
     param.iSpatialLayerNum = 1;
     //if (sliceMode != SM_SINGLE_SLICE && sliceMode != SM_DYN_SLICE) //SM_DYN_SLICE don't support multi-thread now
-//    param.iMultipleThreadIdc = 2;
+    param.iMultipleThreadIdc = 2;
     for (int i = 0; i < param.iSpatialLayerNum; i++) {
         param.sSpatialLayers[i].iVideoWidth = width >> (param.iSpatialLayerNum - 1 - i);
         param.sSpatialLayers[i].iVideoHeight = height >> (param.iSpatialLayerNum - 1 - i);
@@ -199,7 +199,7 @@ extern "C" JNIEXPORT  jint Java_io_github_brucewind_softcodec_StreamHelper_compr
         ALOGW("skip this frame");
         return 0;
     } else {
-        ALOGD("foreach NAL type : %d., laytype is %d.", info.sLayerInfo[i].eFrameType,
+        ALOGD("FrameType : %d, layertype: %d.", info.sLayerInfo[i].eFrameType,
               info.sLayerInfo[i].uiLayerType);
     }
 
@@ -209,9 +209,8 @@ extern "C" JNIEXPORT  jint Java_io_github_brucewind_softcodec_StreamHelper_compr
      * transmit serveral NALUs to RTMP server.
      * Two NAL types : SPS & PPS are very important.
      */
-    for (i = 0; i < info.iLayerNum; i++) {//iLayerNum is the count of  NALUs.
-//        int type = info.sLayerInfo[i].eFrameType;//it is NON_VIDEO_CODING_LAYER
-//
+    for (i = 0; i < info.iLayerNum; i++) {
+//        int fType = info.sLayerInfo[i].eFrameType;//it is NON_VIDEO_CODING_LAYER
 //        if (info.sLayerInfo[i].uiLayerType == NON_VIDEO_CODING_LAYER) {//this NAL type is SPS.
 //        }
         const SLayerBSInfo layerInfo = info.sLayerInfo[i];
@@ -236,7 +235,9 @@ extern "C" JNIEXPORT  jint Java_io_github_brucewind_softcodec_StreamHelper_compr
                     ALOGE("start code not found.");
                 }
             }
-            if (NAL_type == 7 || NAL_type == 8) {
+            ALOGD("NAL type : %d.",NAL_type);
+            //begin to handle one of NALs.
+            if (NAL_type == NAL_SPS || NAL_type == NAL_PPS) {
                 buffer += start_len;
                 handle_sps_pps(NAL_type, buffer, buf_len - start_len);
                 buffer+=(buf_len - start_len);

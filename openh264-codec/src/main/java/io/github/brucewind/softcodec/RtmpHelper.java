@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Created by wei on 16-11-27.
+ * Created by bruce on 16-11-27.
  *
  * It is used to manager picture to be encode, and transfer encoded data to server in {@link ExecutorService}.
  */

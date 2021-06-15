@@ -4,8 +4,8 @@
 
 - [x] 1. encode with x264.
 - [x] 2. push into RTMP server.
-- [ ] 3. encode with openh264.
-- [ ] 4. echo cancellation in software. Maybe need libspeex, currently has a scheme which is hardware scheme in **VOICE_COMMUNICATION**.
+- [x] 3. encode with openh264.
+- [ ] 4. echo cancellation in software. Maybe need libspeex.
 
 
 ## Building & Testing 

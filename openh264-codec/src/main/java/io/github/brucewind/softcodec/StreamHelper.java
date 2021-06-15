@@ -1,7 +1,7 @@
 package io.github.brucewind.softcodec;
 
 /**
- * Created by wei on 16-11-24.
+ * Created by bruce on 16-11-24.
  * It is used to connect server and push stream.
  */
 class StreamHelper {
@@ -21,12 +21,12 @@ class StreamHelper {
     /**
      * x264 function
      * @param encoder
-     * @param NV12
-     * @param NV12size
-     * @param H264
+     * @param I420
+     * @param I420Size
+     * @param H264, it is unused.
      * @return
      */
-    public native int compressBuffer(long encoder, byte[] NV12, int NV12size, byte[] H264);
+    public native int compressBuffer(long encoder, byte[] I420, int I420Size, byte[] H264);
 
     public native long compressBegin(int width, int height, int bitrate, int fps);
 
