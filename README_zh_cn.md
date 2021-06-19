@@ -5,7 +5,7 @@
 - [x] 1. x264编码集成.
 - [x] 2. 推流到RTMP server.
 - [x] 3. openh264编码集成.
-- [ ] 4. 软件回声消除.
+- [ ] 4. 软件消除回声.
 - [ ] 5. 美颜 or 提升亮度 or HDR.
 
 ## 该仓库做了什么工作:
@@ -65,7 +65,6 @@
 
 您可能还没有RTMP服务器. 那么您需要自己建立一个rtmp服务器用于收发数据流。
  
-I had written a blog to teach someone else how to establish it.
 我写了一篇blog教别人如何建立一个rtmp服务器：
 这里是：[blog](https://github.com/BruceWind/BruceWind.github.io/blob/master/md/establish-RTMP-server-with-docker.md).
 
