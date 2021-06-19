@@ -3,9 +3,21 @@
   android:layout_width="match_parent"
   android:layout_height="match_parent">
 
+  <TextView
+    android:id="@+id/tv_sel"
+      android:text="camera: "
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"/>
+  <Spinner
+      android:layout_toRightOf="@+id/tv_sel"
+      android:id="@+id/camera_selection_spinner"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content" />
+
   <EditText
     android:id="@+id/edit_url"
     android:hint="input url like rtmp://192......."
+      android:layout_below="@+id/camera_selection_spinner"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"/>
 
