@@ -9,6 +9,8 @@
 - [ ] 4. echo cancellation in software. Maybe need libspeex.
 
 ## what it did:
+<details>
+<summary>click to expand.</summary>
 
 ``` javascrpt                                                     
          phone                                                          
@@ -53,10 +55,13 @@
                                  |           |
                                  +-----------+            
 ```
-
+     
+</details>
 
 ## Building & Testing 
-
+<details>
+<summary>click to expand.</summary>
+         
 **1. building**
 
 It depend on NDK 16, but you don't need to download manually. 
@@ -79,6 +84,8 @@ modify code in `MainActivity`:
 ``` java 
 private String mRtmpPushUrl = "rtmp://192.168.50.14/live/live";
 ```
+ </details>
+         
 ---------------
 
 In addition, `master` branch has all of stable codes, If you want to look code in development, checkout
