@@ -48,11 +48,18 @@
     android:enabled="false"
     android:text="stop" />
 
-  <com.androidyuan.ui.AutoFitSurfaceView
-    android:id="@+id/surfaceView"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_below="@+id/start" />
+  <androidx.camera.view.PreviewView
+      android:id="@+id/view_finder"
+      android:layout_below="@+id/start"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent" />
+
+
+<!--  <com.androidyuan.ui.AutoFitSurfaceView-->
+<!--    android:id="@+id/surfaceView"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="match_parent"-->
+<!--    android:layout_below="@+id/start" />-->
 
 
 </RelativeLayout>
