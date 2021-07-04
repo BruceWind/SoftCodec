@@ -1,18 +1,14 @@
 plugins {
     id 'com.android.library'
 }
-apply plugin: 'kotlin-android'
+
+
+apply from: '../base.gradle'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.3"
 
-    ndkVersion '21.1.6352462'
-//    ndkVersion "16.1.4479499"
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 21
         versionCode 1
         versionName "1.0"
 

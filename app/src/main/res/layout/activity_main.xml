@@ -1,3 +1,4 @@
+<layout>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
@@ -47,11 +48,12 @@
     android:enabled="false"
     android:text="stop" />
 
-  <SurfaceView
+  <com.androidyuan.ui.AutoFitSurfaceView
     android:id="@+id/surfaceView"
-    android:layout_width="1px"
-    android:layout_height="1px"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:layout_below="@+id/start" />
 
 
 </RelativeLayout>
+</layout>

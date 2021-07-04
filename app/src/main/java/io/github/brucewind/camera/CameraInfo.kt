@@ -1,4 +1,5 @@
 package io.github.brucewind.camera
+import android.hardware.camera2.CameraCharacteristics
 import android.util.Log
 import android.util.Size
 
@@ -20,7 +21,6 @@ data class CameraInfo(
 fun CameraInfo.recommendBitRateByte():Long{
     val DELTA = 20L
     return  (size.width * size.height * fps / DELTA).also {
-
         Log.i("XXA","biterate with bit is $it.")
     }
 }

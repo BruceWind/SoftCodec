@@ -1,3 +1,3 @@
-//include ':x264-codec'
+include ':x264-codec'
 include ':openh264-codec'
 include ':app'

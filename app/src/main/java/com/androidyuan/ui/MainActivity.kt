@@ -1,39 +1,40 @@
 package com.androidyuan.ui
 
-import android.view.SurfaceHolder
-import android.hardware.Camera.PreviewCallback
-import io.github.brucewind.softcodec.RtmpHelper
-import android.view.SurfaceView
-import android.os.Bundle
-import android.view.WindowManager
-import com.androidyuan.softcodec.R
-import android.text.TextWatcher
-import android.text.Editable
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.graphics.ImageFormat
 import android.hardware.Camera
+import android.hardware.Camera.PreviewCallback
 import android.hardware.camera2.CameraManager
-import android.support.v7.app.AppCompatActivity
+import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import android.view.SurfaceHolder
+import android.view.SurfaceView
 import android.view.View
+import android.view.WindowManager
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import com.androidyuan.softcodec.R
+import com.androidyuan.softcodec.databinding.ActivityMainBinding
 import io.github.brucewind.camera.Camera2Helper
 import io.github.brucewind.camera.CameraInfo
 import io.github.brucewind.camera.recommendBitRateByte
-import java.io.IOException
-import java.lang.RuntimeException
+import io.github.brucewind.softcodec.RtmpHelper
 import io.github.brucewind.softcodec.YUVHelper
-import junit.framework.Assert
+import java.io.IOException
 import java.util.concurrent.CopyOnWriteArrayList
 
-class MainActivity : Activity(), SurfaceHolder.Callback, PreviewCallback {
+
+class MainActivity : AppCompatActivity(), SurfaceHolder.Callback, PreviewCallback {
 
     var mCamera: Camera? = null
     var mPreviewHolder: SurfaceHolder? = null
     var mPreviewBuffer: ByteArray? = null
 
+    lateinit var binding: ActivityMainBinding
     //TODO obtain the a compatible set of size from camera.
 
     private val mRtmpHelper = RtmpHelper()
@@ -42,24 +43,20 @@ class MainActivity : Activity(), SurfaceHolder.Callback, PreviewCallback {
     private var mH264Buff: ByteArray? = null
     private var mCurrentTime = 0
     private val encodeTime = 0
-    private var mSurfaveView: SurfaceView? = null
-    private var mEditText: EditText? = null
 
 
     private  var mCameraInfo: CameraInfo? = null
-    private lateinit var mCameraSelectionSpinner: Spinner
     private val mCameraInfoes = CopyOnWriteArrayList<CameraInfo>()//assume it thread-safe
 
     private fun handleCameraInfoesInSpinner() {
-        mCameraSelectionSpinner = findViewById(R.id.camera_selection_spinner) as Spinner
         mCameraInfoes.clear()
         mCameraInfoes.addAll(Camera2Helper.obtainAllSelectedCameraInfoes(getCamera2Manager()))
 
         val spinnerAdapter = ArrayAdapter(this,
             android.R.layout.simple_spinner_item, mCameraInfoes.map { it.name })
 
-        mCameraSelectionSpinner.adapter = spinnerAdapter
-        mCameraSelectionSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+        binding.cameraSelectionSpinner.adapter = spinnerAdapter
+        binding.cameraSelectionSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, pos: Int, p3: Long) {
                 mCameraInfo = mCameraInfoes[pos]
             }
@@ -77,14 +74,14 @@ class MainActivity : Activity(), SurfaceHolder.Callback, PreviewCallback {
             WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
             WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
         )
-        setContentView(R.layout.activity_main)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         handleCameraInfoesInSpinner()
-        mSurfaveView = findViewById(R.id.surfaceView) as SurfaceView
-        mPreviewHolder = mSurfaveView!!.holder
+        
+        mPreviewHolder = binding.surfaceView.holder
         mPreviewHolder!!.addCallback(this)
-        mEditText = findViewById(R.id.edit_url) as EditText
-        mEditText!!.setText(mRtmpPushUrl)
-        mEditText!!.addTextChangedListener(object : TextWatcher {
+
+        binding.editUrl.setText(mRtmpPushUrl)
+        binding.editUrl.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
             override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
             override fun afterTextChanged(editable: Editable) {
@@ -93,22 +90,22 @@ class MainActivity : Activity(), SurfaceHolder.Callback, PreviewCallback {
         })
 
 
-        findViewById(R.id.connect).setOnClickListener { v ->
+        binding.connect.setOnClickListener { v ->
 
             if(mCameraInfo==null) {
                 Toast.makeText(this,"You has not selected any camera size.",Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
             v.isEnabled = false
-            mEditText!!.isEnabled = false
+            binding.editUrl.isEnabled = false
             if (mRtmpHelper.rtmpOpen(mRtmpPushUrl) > 0) {
                 Log.d(TAG, getString(R.string.tips_connect_successfully, mRtmpPushUrl))
                 mCurrentTime = System.currentTimeMillis().toInt()
-                findViewById(R.id.start).isEnabled = true
-                mCameraSelectionSpinner.isEnabled = false
+                binding.start.isEnabled = true
+                binding.cameraSelectionSpinner.isEnabled = false
             } else {
                 v.isEnabled = true
-                mEditText!!.isEnabled = true
+                binding.editUrl.isEnabled = true
                 Toast.makeText(
                     this@MainActivity, getString(
                         R.string.tips_cannt_connect,
@@ -117,19 +114,19 @@ class MainActivity : Activity(), SurfaceHolder.Callback, PreviewCallback {
                 ).show()
             }
         }
-        findViewById(R.id.start).setOnClickListener { v ->
+        binding.start.setOnClickListener { v ->
             v.isEnabled = false
             startCamera()
             mRtmpHelper.startRecordeAudio(mCurrentTime)
-            findViewById(R.id.stop).isEnabled = true
-            mCameraSelectionSpinner.isEnabled = true
+            binding.stop.isEnabled = true
+            binding.cameraSelectionSpinner.isEnabled = true
         }
-        findViewById(R.id.stop).setOnClickListener { v ->
+        binding.stop.setOnClickListener { v ->
             stopStreaming()
             mRtmpHelper.stopRecordeAudio()
             v.isEnabled = false
-            findViewById(R.id.connect).isEnabled = true
-            mCameraSelectionSpinner.isEnabled = false
+            binding.connect.isEnabled = true
+            binding.cameraSelectionSpinner.isEnabled = false
         }
     }
 
@@ -157,10 +154,10 @@ class MainActivity : Activity(), SurfaceHolder.Callback, PreviewCallback {
         val frameSize = stride * height
         val qFrameSize = cStride * height / 2
         mPreviewBuffer = ByteArray(frameSize + qFrameSize * 2)
-        val layoutParams = mSurfaveView!!.layoutParams
+        val layoutParams = binding.surfaceView!!.layoutParams
         layoutParams.width = height
         layoutParams.height = width
-        mSurfaveView!!.layoutParams = layoutParams
+        binding.surfaceView!!.layoutParams = layoutParams
         try {
             mCamera = Camera.open()
             mCamera!!.setDisplayOrientation(90)
@@ -187,7 +184,8 @@ class MainActivity : Activity(), SurfaceHolder.Callback, PreviewCallback {
         // TODO Auto-generated method stub
         mCamera!!.addCallbackBuffer(mPreviewBuffer)
         val i420bytes = YUVHelper.nv21ToI420(data, mCameraInfo!!.size.width, mCameraInfo!!.size.height)
-        Assert.assertEquals(i420bytes.size, data.size)
+        assert(i420bytes.size== data.size)
+
         val result = mRtmpHelper.compressBuffer(
             mEncoderPointer,
             i420bytes,
@@ -226,7 +224,7 @@ class MainActivity : Activity(), SurfaceHolder.Callback, PreviewCallback {
     }
 
     override fun onPause() {
-        findViewById(R.id.stop).performClick()
+        binding.stop.performClick()
         super.onPause()
     }
 

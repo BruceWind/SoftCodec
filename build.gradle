@@ -2,9 +2,17 @@
 
 buildscript {
     ext.kotlin_version = '1.4.32'
+    ext.compiler_version = '3.4.0'
+    ext.buildTool_version = "29.0.3"
     repositories {
-        jcenter()
         google()
+        mavenCentral()
+        maven { url "https://jitpack.io" }
+        //If you live in China, enable these codes.
+//        maven { url'https://maven.aliyun.com/repository/public/' }
+//        maven { url'https://maven.aliyun.com/repository/google/' }
+//        maven { url'https://maven.aliyun.com/repository/jcenter/' }
+//        maven { url'https://maven.aliyun.com/repository/central/' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.2.1'
@@ -17,8 +25,15 @@ buildscript {
 
 allprojects {
     repositories {
-        jcenter()
         google()
+        mavenCentral()
+        maven { url "https://jitpack.io" }
+        //If you live in China, you may have to enable these codes.
+//        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+//        maven { url'https://maven.aliyun.com/repository/public/' }
+//        maven { url'https://maven.aliyun.com/repository/google/' }
+//        maven { url'https://maven.aliyun.com/repository/jcenter/' }
+//        maven { url'https://maven.aliyun.com/repository/central/' }
     }
 }
 
