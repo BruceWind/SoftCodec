@@ -67,7 +67,7 @@
 It depend on NDK 16, but you don't need to download manually. 
 By the time you executed `./gradlew assembleDebug`, gradle will download it automatically in the event that 
 your computer does not has NDK 16.
-
+         
 **2. Testing with a RTMP server:**
 
 You may not have a RTMP server.
@@ -90,3 +90,6 @@ private String mRtmpPushUrl = "rtmp://192.168.50.14/live/live";
 
 In addition, `master` branch has all of stable codes, If you want to look code in development, checkout
  other branches.
+ 
+ 
+Take look at [CodecLibsBuildSH](https://github.com/BruceWind/CodecLibsBuildSH) in case you want to upgrade version of Codec.
