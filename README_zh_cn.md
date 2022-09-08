@@ -70,7 +70,7 @@
 
 **3. 测试推流**
 
-修改`MainActivity`中如下代码:
+修改`MainActivity`中如下代码, 使其指向你的RTMP流媒体服务器:
 ``` java 
 private String mRtmpPushUrl = "rtmp://192.168.50.14/live/live";
 ```
