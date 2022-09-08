@@ -65,8 +65,8 @@
 **1. building**
 
 It depend on NDK 16, but you don't need to download manually. 
-By the time you executed `./gradlew assembleDebug`, gradle will download it automatically in the event that 
-your computer does not has NDK 16.
+By the time you executed `./gradlew assembleDebug`, gradle will download it automatically in case 
+your computer has no NDK 16.
          
 **2. Testing with a RTMP server:**
 
@@ -80,7 +80,7 @@ You can look into the [blog](https://github.com/BruceWind/BruceWind.github.io/bl
 
 **3. Pushing.**
 
-modify code in `MainActivity`:
+modify this code in `MainActivity` to target your rtmp server:
 ``` java 
 private String mRtmpPushUrl = "rtmp://192.168.50.14/live/live";
 ```
