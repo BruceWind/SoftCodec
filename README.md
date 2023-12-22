@@ -8,7 +8,7 @@
 - [x] 3. encode with openh264.
 - [ ] 4. echo cancellation in software. Maybe need libspeex.
 
-## what it did:
+## What It Does:
 <details>
 <summary>click to expand.</summary>
 
@@ -70,17 +70,15 @@ your computer has no NDK 16.
          
 **2. Testing with a RTMP server:**
 
-You may not have a RTMP server.
 
-You need to establish a RTMP server which receives app pushed RTMP stream transmits stream to 
-other players.
+You must have a RTMP server which receives stream app pushed. The RTMP server can also transfer data to video players.
  
 I had written a blog to teach someone else how to establish it.
 You can look into the [blog](https://github.com/BruceWind/BruceWind.github.io/blob/master/md/establish-RTMP-server-with-docker.md).
 
-**3. Pushing.**
+**3. Pushing stream.**
 
-modify this code in `MainActivity` to target your rtmp server:
+modify this code line below in `MainActivity` to point to your rtmp server:
 ``` java 
 private String mRtmpPushUrl = "rtmp://192.168.50.14/live/live";
 ```
